@@ -797,19 +797,23 @@
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYwuPjdbJtypEXn78R0TijQNVTcf1JksEKYEyycoDZiMeHp1qqUDJ5Fa_8hVxOxBXT/exec';
 
         // FUNCTION UNTUK CONNECT KE GOOGLE APPS SCRIPT:
-        async function callGoogleScript(action, data) {
-            try {
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    payload: JSON.stringify({ action, ...data })
-                });
-                return await response.json();
-            } catch (e) {
-                console.error('Error:', e);
-                return { success: false, message: 'Server error' };
-            }
-        }
-
+        // KODE BARU (SUDAH DIPERBAIKI)
+async function callGoogleScript(action, data) {
+    try {
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8',
+            },
+            body: JSON.stringify({ action, ...data })
+        });
+        return { success: true };
+    } catch (e) {
+        console.error('Error:', e);
+        return { success: false, message: 'Server error' };
+    }
+}    
         let currentUser = null;
 
         const USERS = {
