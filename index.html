@@ -208,7 +208,6 @@
             changeSystemLanguage(currentLang);
         }
 
-        // LANDING PAGE BERSIH & ENTERPRISE
         function renderLanding(container) {
             container.innerHTML = `
                 <div class="max-w-5xl mx-auto px-4 py-24 text-center">
@@ -224,7 +223,6 @@
                 </div>`;
         }
 
-        // HALAMAN LOGIN
         function renderLogin(container) {
             container.innerHTML = `
                 <div class="flex-grow flex items-center justify-center p-4 py-12">
@@ -255,7 +253,6 @@
                 </div>`;
         }
 
-        // HALAMAN REGISTRASI
         function renderRegister(container) {
             container.innerHTML = `
                 <div class="flex-grow flex items-center justify-center p-4 py-12">
@@ -317,7 +314,6 @@
             }
         }
 
-        // DASHBOARD WORKER DENGAN EXPIRY WARNING & PEMBAYARAN 99 SAR
         function renderWorkerDashboard(container, user) {
             currentUser = user;
             let expiryWarning = '';
@@ -353,7 +349,7 @@
                 </div>`;
         }
 
-        // DASHBOARD LAWYER
+        // LAWYER DASHBOARD: DAFTAR KLIEN TERPISAH DENGAN MUTABA'AH (LIVE MONITORING)
         function renderLawyerDashboard(container, user) {
             currentUser = user;
             container.innerHTML = `
@@ -361,19 +357,66 @@
                     <div class="bg-brand-navy rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
                         <div>
                             <h2 class="text-2xl font-bold">Advokat Portal: ${user.name}</h2>
-                            <p class="text-amber-400 text-sm">Lisensi Praktik Aktif</p>
+                            <p class="text-amber-400 text-sm">Lisensi Praktik Aktif | Sistem Pemantauan Kasus (Mutaba'ah)</p>
                         </div>
                         <button onclick="switchView('landing')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold" data-i18n="logout">Keluar</button>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow border">
-                        <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="chat_title">📥 Ruang Pesan Masuk Klien</h3>
-                        <p class="text-sm text-slate-500 mb-4">Pesan dari pekerja akan otomatis diterjemahkan real-time sesuai preferensi bahasa.</p>
-                        <button onclick="switchView('consultation', {user: currentUser, partnerId: '2xxxxxxxx0', partnerName: 'Pekerja Klien'})" class="bg-brand-navy text-white px-4 py-2.5 rounded-xl text-sm font-bold" data-i18n="btn_open_chat">Buka Konsultasi Klien</button>
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg text-brand-navy">📋 Daftar Klien & Ruang Pesan Terpisah</h3>
+                                <p class="text-sm text-slate-500">Pilih salah satu klien di bawah untuk membuka ruang konsultasi dan memantau kasusnya secara mutaba'ah (real-time).</p>
+                            </div>
+                            <button onclick="loadLawyerClientsList()" class="bg-slate-100 hover:bg-slate-200 text-brand-navy text-xs font-bold px-3 py-2 rounded-lg border"><i class="fa-solid fa-rotate"></i> Muat Ulang Klien</button>
+                        </div>
+                        <div id="lawyer-clients-container" class="space-y-3">
+                            <p class="text-slate-500 text-sm">Memuat daftar klien...</p>
+                        </div>
                     </div>
                 </div>`;
+            loadLawyerClientsList();
         }
 
-        // DASHBOARD ADMIN LAPORAN PEMBAYARAN 99 SAR
+        function loadLawyerClientsList() {
+            const container = document.getElementById('lawyer-clients-container');
+            if(!container) return;
+            container.innerHTML = `<p class="text-slate-500 text-sm">Memuat daftar klien...</p>`;
+            
+            fetch(CONFIG.API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'getLawyerClients', lawyerIqamah: currentUser.iqamah })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success && res.clients && res.clients.length > 0) {
+                    let html = `<div class="grid gap-3">`;
+                    res.clients.forEach(c => {
+                        html += `
+                            <div class="border rounded-xl p-4 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition">
+                                <div>
+                                    <h4 class="font-bold text-brand-navy text-base">${c.name}</h4>
+                                    <p class="text-xs text-slate-500">Iqamah: <span class="font-semibold text-slate-700">${c.iqamah}</span></p>
+                                    <p class="text-xs text-slate-600 mt-1 truncate max-w-md"><b>Pesan Terakhir:</b> ${c.lastMessage}</p>
+                                </div>
+                                <button onclick="switchView('consultation', {user: currentUser, partnerId: '${c.iqamah}', partnerName: '${c.name}'})" class="bg-brand-navy text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow">
+                                    Buka Konsultasi <i class="fa-solid fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>`;
+                    });
+                    html += `</div>`;
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="p-8 text-center bg-slate-50 border rounded-xl">
+                            <p class="text-slate-500 text-sm mb-3">Belum ada klien atau pesan masuk yang terdaftar dalam sistem mutaba'ah.</p>
+                            <p class="text-xs text-slate-400">Jika klien mengirim pesan baru dari akun mereka, daftar klien akan otomatis muncul di sini.</p>
+                        </div>`;
+                }
+            }).catch(err => {
+                container.innerHTML = `<p class="text-red-500 text-sm">Gagal memuat daftar klien.</p>`;
+            });
+        }
+
         function renderAdminDashboard(container, user) {
             currentUser = user;
             container.innerHTML = `
@@ -419,15 +462,18 @@
             .then(res => { hideLoader(); alert(res.message); loadAdminData(); });
         }
 
-        // KONSULTASI & CHAT DENGAN TERJEMAHAN 3 BAHASA REAL & UPLOAD FILE JPG/PDF
         function renderConsultation(container, data) {
             const partnerId = data.partnerId;
             const partnerName = data.partnerName;
+            const backDashboard = currentUser.role === 'lawyer' ? 'lawyerDashboard' : 'workerDashboard';
 
             container.innerHTML = `
                 <div class="max-w-4xl mx-auto px-4 py-8 w-full flex flex-col h-[82vh]">
                     <div class="bg-brand-navy text-white p-4 rounded-t-2xl flex justify-between items-center shadow">
-                        <h3 class="font-bold">Konsultasi: ${partnerName}</h3>
+                        <div>
+                            <h3 class="font-bold">Konsultasi: ${partnerName}</h3>
+                            <p class="text-xs text-amber-300">ID Partner: ${partnerId} (Mutaba'ah Aktif)</p>
+                        </div>
                         <div class="flex items-center gap-2">
                             <span class="text-xs text-amber-300">Terjemahan Target:</span>
                             <select id="chatTargetLang" class="bg-slate-800 text-white text-xs rounded px-2 py-1 font-bold">
@@ -435,7 +481,7 @@
                                 <option value="id">Bahasa Indonesia 🇮🇩</option>
                                 <option value="en">English 🇬🇧</option>
                             </select>
-                            <button onclick="switchView('${currentUser.role}Dashboard', currentUser)" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg ml-2">Kembali</button>
+                            <button onclick="switchView('${backDashboard}', currentUser)" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg ml-2">Kembali</button>
                         </div>
                     </div>
                     <div id="chat-box" class="flex-grow bg-white border-x border-slate-200 p-4 overflow-y-auto space-y-4 flex flex-col">
