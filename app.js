@@ -20,6 +20,34 @@ function sendToGoogleSheet(formData) {
         console.error("Gagal mengirim data:", error);
     });
 }
+
+function handleRegistration(event) {
+    event.preventDefault();
+    const iqamah = getEl('reg-iqamah')?.value;
+    const name = getEl('reg-fullname')?.value;
+    const password = getEl('reg-password')?.value;
+    const role = getEl('reg-role')?.value || 'worker';
+    const email = getEl('reg-email')?.value || '';
+    const phone = getEl('reg-phone')?.value || '';
+
+    if (!iqamah || !password) {
+        alert('Lengkapi data Anda');
+        return;
+    }
+
+    // Kirim data ke Google Sheets
+    sendToGoogleSheet({
+        name: name,
+        iqamah: iqamah,
+        email: email,
+        phone: phone,
+        role: role
+    });
+
+    alert('Pendaftaran Berhasil & Data Tersimpan!');
+    closeRegisterModal();
+}
+
 const translations = {
     id: {
         login: 'Masuk',
