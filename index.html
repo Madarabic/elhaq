@@ -886,60 +886,64 @@
             }
         }
 
-        function handleRegistration(event) {
-            event.preventDefault();
-            const iqamah = document.getElementById('reg-iqamah').value;
-            const name = document.getElementById('reg-fullname').value;
-            const password = document.getElementById('reg-password').value;
-            const role = document.getElementById('reg-role').value;
+        async function handleRegistration(event) {
+    event.preventDefault();
+    
+    const data = {
+        action: document.getElementById('reg-role').value === 'worker' ? 'registerWorker' : 'registerLawyer',
+        iqamah: document.getElementById('reg-iqamah').value,
+        name: document.getElementById('reg-fullname').value,
+        email: document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value,
+        phone: document.getElementById('reg-phone').value
+    };
+    
+    // Worker fields
+    if (document.getElementById('reg-role').value === 'worker') {
+        data.workplace = document.getElementById('reg-workplace').value;
+        data.nationality = document.getElementById('reg-nationality').value;
+    }
+    
+    // Lawyer fields
+    if (document.getElementById('reg-role').value === 'lawyer') {
+        data.license = document.getElementById('reg-license').value;
+        data.experience = document.getElementById('reg-experience').value;
+        data.lawFirm = document.getElementById('reg-law-firm').value;
+    }
+    
+    const result = await callGoogleScript(data.action, data);
+    
+    if (result.success) {
+        alert('✅ Registrasi berhasil! Silakan login.');
+        closeRegisterModal();
+    } else {
+        alert('❌ Error: ' + result.message);
+    }
+}
 
-            if (!iqamah || !password) {
-                alert(translations[currentLanguage]['reg-subtitle']);
-                return;
-            }
-
-            REGISTERED_USERS[iqamah] = {
-                iqamah: iqamah,
-                name: name,
-                password: password,
-                role: role,
-                email: document.getElementById('reg-email').value,
-                phone: document.getElementById('reg-phone').value,
-                isPaid: false
-            };
-
-            alert(translations[currentLanguage]['submit-reg']);
-            closeRegisterModal();
-        }
-
-        function handleLogin(event) {
-            event.preventDefault();
-            const iqamah = document.getElementById('login-iqamah').value;
-            const password = document.getElementById('login-password').value;
-
-            if (iqamah === 'ADMIN001' && password === 'admin123') {
-                currentUser = USERS['admin'];
-                closeLoginModal();
-                initSession();
-                return;
-            }
-
-            if (REGISTERED_USERS[iqamah] && REGISTERED_USERS[iqamah].password === password) {
-                const user = REGISTERED_USERS[iqamah];
-                currentUser = {
-                    name: user.name,
-                    role: user.role === 'worker' ? 'WORKER (PMI)' : 'LAWYER',
-                    portal: user.role === 'worker' ? 'worker' : 'lawyer',
-                    iqamah: iqamah,
-                    isPaid: user.isPaid
-                };
-                closeLoginModal();
-                initSession();
-                return;
-            }
-
-            alert('Iqamah atau password salah!');
-        }
+        async function handleLogin(event) {
+    event.preventDefault();
+    
+    const iqamah = document.getElementById('login-iqamah').value;
+    const password = document.getElementById('login-password').value;
+    
+    // Kirim ke Google Apps Script untuk verifikasi
+    // (Ini bisa dilakukan di backend sheet untuk keamanan)
+    
+    // Untuk demo, gunakan validation lokal atau:
+    const result = await callGoogleScript('verifyLogin', { 
+        iqamah, 
+        password 
+    });
+    
+    if (result.success) {
+        currentUser = result.user;
+        closeLoginModal();
+        initSession();
+    } else {
+        alert('Iqamah atau password salah!');
+    }
+}
 
         function handleLogout() {
             currentUser = null;
@@ -998,14 +1002,45 @@
             }, 1000);
         }
 
-        function handleUpload(event) {
-            event.preventDefault();
-            const file = document.getElementById('upload-file-input').files[0];
-            if (file) {
-                alert(translations[currentLanguage]['upload-submit'] + ': ' + file.name);
-                closeUploadModal();
-            }
+        async function handleUpload(event) {
+    event.preventDefault();
+    
+    const file = document.getElementById('upload-file-input').files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('iqamah', currentUser.iqamah);
+    formData.append('fileType', 'payment_receipt');
+    
+    try {
+        // Upload ke Google Drive via Google Apps Script
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            payload: JSON.stringify({
+                action: 'uploadFile',
+                iqamah: currentUser.iqamah,
+                fileName: file.name,
+                fileSize: file.size
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            // Catat pembayaran di Sheets
+            await callGoogleScript('recordPayment', {
+                iqamah: currentUser.iqamah,
+                name: currentUser.name,
+                amount: 99,
+                method: 'transfer',
+                receiptLink: result.fileLink
+            });
+            
+            alert('✅ Pembayaran berhasil diupload! Menunggu verifikasi admin.');
+            closeUploadModal();
         }
+    } catch (e) {
+        alert('❌ Error: ' + e.message);
+    }
+}
 
         function switchLawyerTab(tab) {
             document.querySelectorAll('[id^="lawyer-tab-"]').forEach(el => el.classList.add('hidden'));
