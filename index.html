@@ -102,23 +102,7 @@
             </div>
         </div>
     </header>
-    
-// TAMBAHKAN INI SETELAH KONFIGURASI BAHASA:
-const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYwuPjdbJtypEXn78R0TijQNVTcf1JksEKYEyycoDZiMeHp1qqUDJ5Fa_8hVxOxBXT/exec';
 
-// FUNCTION UNTUK CONNECT KE GOOGLE APPS SCRIPT:
-async function callGoogleScript(action, data) {
-    try {
-        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-            method: 'POST',
-            payload: JSON.stringify({ action, ...data })
-        });
-        return await response.json();
-    } catch (e) {
-        console.error('Error:', e);
-        return { success: false, message: 'Server error' };
-    }
-}
     <!-- LANDING PAGE -->
     <div id="landing-page" class="space-y-12 py-12">
         <section class="max-w-7xl mx-auto px-4 lg:px-8 text-center space-y-6">
@@ -808,6 +792,24 @@ async function callGoogleScript(action, data) {
         };
 
         let currentLanguage = 'id';
+
+        // TAMBAHKAN INI SETELAH KONFIGURASI BAHASA:
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/d/YOUR_DEPLOYMENT_ID/userweb';
+
+        // FUNCTION UNTUK CONNECT KE GOOGLE APPS SCRIPT:
+        async function callGoogleScript(action, data) {
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    payload: JSON.stringify({ action, ...data })
+                });
+                return await response.json();
+            } catch (e) {
+                console.error('Error:', e);
+                return { success: false, message: 'Server error' };
+            }
+        }
+
         let currentUser = null;
 
         const USERS = {
