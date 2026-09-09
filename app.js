@@ -2,7 +2,24 @@
  * HAQ SAUDI PREMIUM - Main Application Logic
  * Fixed & Error-Proof Version
  */
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYwuPjdbJtypEXn78R0TijQNVTcf1JksEKYEyycoDZiMeHp1qqUDJ5Fa_8hVxOxBXT/exec";
 
+function sendToGoogleSheet(formData) {
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(() => {
+        console.log("Data berhasil dikirim ke Google Sheets!");
+    })
+    .catch(error => {
+        console.error("Gagal mengirim data:", error);
+    });
+}
 const translations = {
     id: {
         login: 'Masuk',
