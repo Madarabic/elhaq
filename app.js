@@ -4,8 +4,9 @@
  */
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYwuPjdbJtypEXn78R0TijQNVTcf1JksEKYEyycoDZiMeHp1qqUDJ5Fa_8hVxOxBXT/exec";
 
+// Fungsi Pengirim Data ke Google Apps Script
 function sendToGoogleSheet(formData) {
-    fetch(GOOGLE_SCRIPT_URL, {
+    return fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -15,37 +16,12 @@ function sendToGoogleSheet(formData) {
     })
     .then(() => {
         console.log("Data berhasil dikirim ke Google Sheets!");
+        return true;
     })
     .catch(error => {
         console.error("Gagal mengirim data:", error);
+        return false;
     });
-}
-
-function handleRegistration(event) {
-    event.preventDefault();
-    const iqamah = getEl('reg-iqamah')?.value;
-    const name = getEl('reg-fullname')?.value;
-    const password = getEl('reg-password')?.value;
-    const role = getEl('reg-role')?.value || 'worker';
-    const email = getEl('reg-email')?.value || '';
-    const phone = getEl('reg-phone')?.value || '';
-
-    if (!iqamah || !password) {
-        alert('Lengkapi data Anda');
-        return;
-    }
-
-    // Kirim data ke Google Sheets
-    sendToGoogleSheet({
-        name: name,
-        iqamah: iqamah,
-        email: email,
-        phone: phone,
-        role: role
-    });
-
-    alert('Pendaftaran Berhasil & Data Tersimpan!');
-    closeRegisterModal();
 }
 
 const translations = {
@@ -282,7 +258,6 @@ const USERS = {
 
 const REGISTERED_USERS = {};
 
-// Helper aman untuk manipulasi class/style DOM
 function getEl(id) {
     return document.getElementById(id);
 }
@@ -351,7 +326,6 @@ function closeLoginModal() {
     }
 }
 
-// Fungsi Quick Login untuk Admin/Role Card
 function quickLogin(role) {
     if (role === 'admin') {
         currentUser = USERS['admin'];
@@ -386,29 +360,56 @@ function updateFileName(input, displayId) {
     }
 }
 
+// Fungsi Registrasi Tunggal & Terhubung ke Google Apps Script
 function handleRegistration(event) {
     event.preventDefault();
     const iqamah = getEl('reg-iqamah')?.value;
     const name = getEl('reg-fullname')?.value;
     const password = getEl('reg-password')?.value;
     const role = getEl('reg-role')?.value || 'worker';
+    const email = getEl('reg-email')?.value || '';
+    const phone = getEl('reg-phone')?.value || '';
+    const workplace = getEl('reg-workplace')?.value || '';
+    const nationality = getEl('reg-nationality')?.value || '';
+    const license = getEl('reg-license')?.value || '';
+    const experience = getEl('reg-experience')?.value || '';
+    const lawFirm = getEl('reg-lawfirm')?.value || '';
 
-    if (!iqamah || !password) {
+    if (!iqamah || !password || !name) {
         alert(translations[currentLanguage]['reg-subtitle'] || 'Lengkapi data Anda');
         return;
     }
 
+    // Simpan ke sesi lokal
     REGISTERED_USERS[iqamah] = {
         iqamah: iqamah,
         name: name,
         password: password,
         role: role,
-        email: getEl('reg-email')?.value || '',
-        phone: getEl('reg-phone')?.value || '',
+        email: email,
+        phone: phone,
         isPaid: false
     };
 
-    alert(translations[currentLanguage]['submit-reg'] || 'Pendaftaran Berhasil!');
+    // Siapkan payload data untuk dikirim ke Google Sheets
+    const payload = {
+        action: role === 'worker' ? 'registerWorker' : 'registerLawyer',
+        iqamah: iqamah,
+        name: name,
+        password: password,
+        email: email,
+        phone: phone,
+        workplace: workplace,
+        nationality: nationality,
+        license: license,
+        experience: experience,
+        lawFirm: lawFirm
+    };
+
+    // Kirim data ke backend
+    sendToGoogleSheet(payload);
+
+    alert(translations[currentLanguage]['submit-reg'] || 'Pendaftaran Berhasil & Data Tersimpan!');
     closeRegisterModal();
 }
 
@@ -548,6 +549,14 @@ function adminApprove(iqamah) {
     const actionCell = getEl('admin-action-cell');
     if (statusCell) statusCell.innerHTML = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-bold">Verified (99 SAR)</span>`;
     if (actionCell) actionCell.innerHTML = `<button disabled class="px-3 py-1 bg-slate-200 text-slate-500 rounded-xl text-xs font-bold">Verified</button>`;
+    
+    // Kirim verifikasi pembayaran ke Google Apps Script
+    sendToGoogleSheet({
+        action: 'verifyPayment',
+        iqamah: iqamah,
+        verifiedBy: 'Admin'
+    });
+
     alert(`Pembayaran diverifikasi untuk Iqamah ${iqamah}`);
 }
 
