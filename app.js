@@ -1,3 +1,8 @@
+/**
+ * HAQ SAUDI PREMIUM - Main Application Logic
+ * Fixed & Error-Proof Version
+ */
+
 const translations = {
     id: {
         login: 'Masuk',
@@ -223,7 +228,6 @@ const translations = {
     }
 };
 
-// Mengambil default language dari CONFIG yang ada di config.js
 let currentLanguage = typeof CONFIG !== 'undefined' ? CONFIG.DEFAULT_LANGUAGE : 'id';
 let currentUser = null;
 
@@ -233,7 +237,13 @@ const USERS = {
 
 const REGISTERED_USERS = {};
 
+// Helper aman untuk manipulasi class/style DOM
+function getEl(id) {
+    return document.getElementById(id);
+}
+
 function changeLanguage(lang) {
+    if (!translations[lang]) return;
     currentLanguage = lang;
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
@@ -243,72 +253,103 @@ function changeLanguage(lang) {
 function updateTranslations() {
     document.querySelectorAll('.lang-text').forEach(elem => {
         const key = elem.getAttribute('data-id');
-        if (translations[currentLanguage][key]) {
+        if (translations[currentLanguage] && translations[currentLanguage][key]) {
             elem.textContent = translations[currentLanguage][key];
         }
     });
 }
 
 function openRegisterModal(roleType) {
-    document.getElementById('register-modal').classList.remove('hidden');
-    document.getElementById('register-modal').classList.add('flex');
-    document.getElementById('reg-role').value = roleType;
+    const modal = getEl('register-modal');
+    if (!modal) return;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    if (getEl('reg-role')) getEl('reg-role').value = roleType;
 
     if (roleType === 'worker') {
-        document.getElementById('worker-fields').classList.remove('hidden');
-        document.getElementById('lawyer-fields').classList.add('hidden');
-        document.getElementById('contract-upload').classList.remove('hidden');
-        document.getElementById('license-upload').classList.add('hidden');
+        getEl('worker-fields')?.classList.remove('hidden');
+        getEl('lawyer-fields')?.classList.add('hidden');
+        getEl('contract-upload')?.classList.remove('hidden');
+        getEl('license-upload')?.classList.add('hidden');
     } else {
-        document.getElementById('worker-fields').classList.add('hidden');
-        document.getElementById('lawyer-fields').classList.remove('hidden');
-        document.getElementById('contract-upload').classList.add('hidden');
-        document.getElementById('license-upload').classList.remove('hidden');
+        getEl('worker-fields')?.classList.add('hidden');
+        getEl('lawyer-fields')?.classList.remove('hidden');
+        getEl('contract-upload')?.classList.add('hidden');
+        getEl('license-upload')?.classList.remove('hidden');
     }
 }
 
 function closeRegisterModal() {
-    document.getElementById('register-modal').classList.add('hidden');
-    document.getElementById('register-modal').classList.remove('flex');
-    document.getElementById('register-form').reset();
+    const modal = getEl('register-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    getEl('register-form')?.reset();
 }
 
 function openLoginModal() {
-    document.getElementById('login-modal').classList.remove('hidden');
-    document.getElementById('login-modal').classList.add('flex');
+    const modal = getEl('login-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
 }
 
 function closeLoginModal() {
-    document.getElementById('login-modal').classList.add('hidden');
-    document.getElementById('login-modal').classList.remove('flex');
+    const modal = getEl('login-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+// Fungsi Quick Login untuk Admin/Role Card
+function quickLogin(role) {
+    if (role === 'admin') {
+        currentUser = USERS['admin'];
+        closeLoginModal();
+        initSession();
+    } else {
+        openLoginModal();
+    }
 }
 
 function showUploadModal(roleType) {
-    document.getElementById('upload-modal').classList.remove('hidden');
-    document.getElementById('upload-modal').classList.add('flex');
-    document.getElementById('upload-modal').dataset.role = roleType;
+    const modal = getEl('upload-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        modal.dataset.role = roleType;
+    }
 }
 
 function closeUploadModal() {
-    document.getElementById('upload-modal').classList.add('hidden');
-    document.getElementById('upload-modal').classList.remove('flex');
+    const modal = getEl('upload-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 }
 
 function updateFileName(input, displayId) {
-    if (input.files[0]) {
-        document.getElementById(displayId).textContent = `✓ ${input.files[0].name} (${(input.files[0].size / 1024).toFixed(1)} KB)`;
+    const displayEl = getEl(displayId);
+    if (input && input.files[0] && displayEl) {
+        displayEl.textContent = `✓ ${input.files[0].name} (${(input.files[0].size / 1024).toFixed(1)} KB)`;
     }
 }
 
 function handleRegistration(event) {
     event.preventDefault();
-    const iqamah = document.getElementById('reg-iqamah').value;
-    const name = document.getElementById('reg-fullname').value;
-    const password = document.getElementById('reg-password').value;
-    const role = document.getElementById('reg-role').value;
+    const iqamah = getEl('reg-iqamah')?.value;
+    const name = getEl('reg-fullname')?.value;
+    const password = getEl('reg-password')?.value;
+    const role = getEl('reg-role')?.value || 'worker';
 
     if (!iqamah || !password) {
-        alert(translations[currentLanguage]['reg-subtitle']);
+        alert(translations[currentLanguage]['reg-subtitle'] || 'Lengkapi data Anda');
         return;
     }
 
@@ -317,19 +358,19 @@ function handleRegistration(event) {
         name: name,
         password: password,
         role: role,
-        email: document.getElementById('reg-email').value,
-        phone: document.getElementById('reg-phone').value,
+        email: getEl('reg-email')?.value || '',
+        phone: getEl('reg-phone')?.value || '',
         isPaid: false
     };
 
-    alert(translations[currentLanguage]['submit-reg']);
+    alert(translations[currentLanguage]['submit-reg'] || 'Pendaftaran Berhasil!');
     closeRegisterModal();
 }
 
 function handleLogin(event) {
     event.preventDefault();
-    const iqamah = document.getElementById('login-iqamah').value;
-    const password = document.getElementById('login-password').value;
+    const iqamah = getEl('login-iqamah')?.value;
+    const password = getEl('login-password')?.value;
 
     if (iqamah === 'ADMIN001' && password === 'admin123') {
         currentUser = USERS['admin'];
@@ -357,85 +398,115 @@ function handleLogin(event) {
 
 function handleLogout() {
     currentUser = null;
-    document.getElementById('nav-user-controls').classList.add('hidden');
-    document.getElementById('btn-open-login').classList.remove('hidden');
+    getEl('nav-user-controls')?.classList.add('hidden');
+    getEl('btn-open-login')?.classList.remove('hidden');
     showLandingPage();
 }
 
 function showLandingPage() {
-    document.getElementById('landing-page').classList.remove('hidden');
-    document.getElementById('main-app').classList.add('hidden');
+    getEl('landing-page')?.classList.remove('hidden');
+    getEl('main-app')?.classList.add('hidden');
 }
 
 function initSession() {
-    document.getElementById('landing-page').classList.add('hidden');
-    document.getElementById('btn-open-login').classList.add('hidden');
-    document.getElementById('nav-user-controls').classList.remove('hidden');
-    document.getElementById('main-app').classList.remove('hidden');
+    getEl('landing-page')?.classList.add('hidden');
+    getEl('btn-open-login')?.classList.add('hidden');
+    getEl('nav-user-controls')?.classList.remove('hidden');
+    getEl('main-app')?.classList.remove('hidden');
 
-    document.getElementById('user-display-name').innerText = currentUser.name;
-    document.getElementById('user-display-role').innerText = currentUser.role;
-    document.getElementById('user-avatar').innerText = currentUser.name.charAt(0);
+    if (currentUser) {
+        if (getEl('user-display-name')) getEl('user-display-name').innerText = currentUser.name;
+        if (getEl('user-display-role')) getEl('user-display-role').innerText = currentUser.role;
+        if (getEl('user-avatar')) getEl('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
 
-    ['worker', 'lawyer', 'admin'].forEach(p => {
-        const sec = document.getElementById(`portal-${p}`);
-        if (p === currentUser.portal) {
-            sec.classList.remove('hidden');
-        } else {
-            sec.classList.add('hidden');
-        }
-    });
+        ['worker', 'lawyer', 'admin'].forEach(p => {
+            const sec = getEl(`portal-${p}`);
+            if (sec) {
+                if (p === currentUser.portal) {
+                    sec.classList.remove('hidden');
+                } else {
+                    sec.classList.add('hidden');
+                }
+            }
+        });
+    }
 }
 
 function pmiSendConsultation(event) {
     event.preventDefault();
-    const input = document.getElementById('pmi-msg-input');
-    const stream = document.getElementById('pmi-chat-stream');
+    const input = getEl('pmi-msg-input');
+    const stream = getEl('pmi-chat-stream');
+
+    if (!input || !stream || !input.value.trim()) return;
 
     const msgDiv = document.createElement('div');
     msgDiv.className = "p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs space-y-1";
     msgDiv.innerHTML = `
-        <span class="font-bold text-amber-900">${currentUser.name} (${translations[currentLanguage]['status-text']} Anda):</span>
+        <span class="font-bold text-amber-900">${currentUser ? currentUser.name : 'Anda'} (${translations[currentLanguage]['status-text'] || 'Status'} Anda):</span>
         <p class="text-slate-800">${input.value}</p>
     `;
     stream.appendChild(msgDiv);
+    const userMsg = input.value;
     input.value = '';
+    stream.scrollTop = stream.scrollHeight;
 
     setTimeout(() => {
         const replyDiv = document.createElement('div');
         replyDiv.className = "p-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-xs space-y-1";
         replyDiv.innerHTML = `
-            <span class="font-bold text-slate-900">Dr. Muhammad Al-Rashid (${translations[currentLanguage].consultation}):</span>
-            <p class="text-slate-800">${translations[currentLanguage]['info-2']}</p>
+            <span class="font-bold text-slate-900">Dr. Muhammad Al-Rashid (${translations[currentLanguage].consultation || 'Konsultasi'}):</span>
+            <p class="text-slate-800">${translations[currentLanguage]['info-2'] || 'Terima kasih, pertanyaan Anda telah diterima dan akan direspons dalam 24 jam.'}</p>
         `;
         stream.appendChild(replyDiv);
+        stream.scrollTop = stream.scrollHeight;
     }, 1000);
 }
 
 function handleUpload(event) {
     event.preventDefault();
-    const file = document.getElementById('upload-file-input').files[0];
+    const fileInput = getEl('upload-file-input');
+    const file = fileInput?.files[0];
     if (file) {
-        alert(translations[currentLanguage]['upload-submit'] + ': ' + file.name);
+        alert((translations[currentLanguage]['upload-submit'] || 'Upload File') + ': ' + file.name);
         closeUploadModal();
+    } else {
+        alert('Pilih file terlebih dahulu.');
     }
 }
 
 function switchLawyerTab(tab) {
     document.querySelectorAll('[id^="lawyer-tab-"]').forEach(el => el.classList.add('hidden'));
-    document.querySelector(`#lawyer-tab-${tab}`).classList.remove('hidden');
+    const targetTab = getEl(`lawyer-tab-${tab}`);
+    if (targetTab) targetTab.classList.remove('hidden');
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
         btn.classList.add('inactive');
     });
-    document.querySelector(`[data-tab="${tab}"]`).classList.remove('inactive');
-    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+    const activeBtn = document.querySelector(`[data-tab="${tab}"]`);
+    if (activeBtn) {
+        activeBtn.classList.remove('inactive');
+        activeBtn.classList.add('active');
+    }
+}
+
+function showLawyerReplyModal(btn) {
+    const replyText = prompt("Ketikkan balasan/jawaban konsultasi advokat:");
+    if (replyText) {
+        alert("Balasan berhasil dikirimkan ke pekerja!");
+    }
 }
 
 function adminApprove(iqamah) {
-    document.getElementById('admin-status-cell').innerHTML = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-bold">Verified (99 SAR)</span>`;
-    document.getElementById('admin-action-cell').innerHTML = `<button disabled class="px-3 py-1 bg-slate-200 text-slate-500 rounded-xl text-xs font-bold">Verified</button>`;
-    alert(`Payment verified for Iqamah ${iqamah}`);
+    const statusCell = getEl('admin-status-cell');
+    const actionCell = getEl('admin-action-cell');
+    if (statusCell) statusCell.innerHTML = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-bold">Verified (99 SAR)</span>`;
+    if (actionCell) actionCell.innerHTML = `<button disabled class="px-3 py-1 bg-slate-200 text-slate-500 rounded-xl text-xs font-bold">Verified</button>`;
+    alert(`Pembayaran diverifikasi untuk Iqamah ${iqamah}`);
 }
 
-updateTranslations();
+// Inisialisasi saat halaman selesai dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    updateTranslations();
+});
