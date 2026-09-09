@@ -4,48 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HAQ SAUDI - Portal Perlindungan Hukum & Ketenagakerjaan</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        brand: {
-                            navy: '#0B192C',
-                            gold: '#D4AF37',
-                            lightGold: '#FDF8E2',
-                            accent: '#1E3E62'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        arabic: ['Amiri', 'serif']
-                    }
+                    colors: { brand: { navy: '#0B192C', gold: '#D4AF37', accent: '#1E3E62' } },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], arabic: ['Amiri', 'serif'] }
                 }
             }
         }
     </script>
-    <style>
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .premium-card {
-            background: #ffffff;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow: 0 10px 30px -5px rgba(11, 25, 44, 0.08);
-        }
-    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between" id="body-dir">
 
-    <!-- HEADER & NAVIGATION -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('landing')">
@@ -54,352 +28,323 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-extrabold text-brand-navy tracking-tight">HAQ <span class="text-amber-600">SAUDI</span></h1>
-                    <p class="text-xs text-slate-500 font-medium" data-i18n="subtitle">Portal Hukum & PMI Profesional</p>
+                    <p class="text-xs text-slate-500 font-medium">Portal Hukum & PMI Profesional</p>
                 </div>
             </div>
-
             <div class="flex items-center gap-4">
-                <!-- Multi-Language Selector -->
-                <select id="langSelector" onchange="changeLanguage(this.value)" class="bg-slate-100 border border-slate-200 text-slate-700 text-sm rounded-lg px-3 py-2 outline-none font-semibold focus:ring-2 focus:ring-amber-500">
+                <select id="langSelector" onchange="changeLanguage(this.value)" class="bg-slate-100 border text-sm rounded-lg px-3 py-2 font-semibold">
                     <option value="id">🇮🇩 ID</option>
                     <option value="ar">🇸🇦 AR</option>
                     <option value="en">🇬🇧 EN</option>
                 </select>
-
-                <div id="authNavButtons" class="flex gap-2">
-                    <button onclick="switchView('login')" class="bg-brand-navy hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all">
-                        <i class="fa-solid fa-right-to-bracket mr-2"></i><span data-i18n="loginBtn">Masuk</span>
-                    </button>
-                </div>
+                <button onclick="switchView('login')" class="bg-brand-navy text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i>Masuk
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN APP CONTAINER -->
-    <main id="app-container" class="flex-grow flex flex-col relative w-full">
-        <!-- Dynamic Views Injected Here -->
-    </main>
+    <main id="app-container" class="flex-grow flex flex-col relative w-full"></main>
 
-    <!-- FOOTER -->
-    <footer class="bg-brand-navy text-white py-8 border-t border-amber-500/30">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-sm text-slate-300 font-medium" data-i18n="footerText">© 2026 HAQ SAUDI Premium Portal. Hak Cipta Dilindungi Undang-Undang.</p>
-        </div>
+    <footer class="bg-brand-navy text-white py-6 border-t border-amber-500/30 text-center text-sm">
+        <p>© 2026 HAQ SAUDI Premium Portal. Hak Cipta Dilindungi.</p>
     </footer>
 
-    <!-- LOADING OVERLAY -->
     <div id="loading-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center">
         <div class="w-14 h-14 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-white font-bold mt-4 tracking-wide" data-i18n="loadingText">Memproses Data...</p>
+        <p class="text-white font-bold mt-4">Memproses Data...</p>
     </div>
 
-    <!-- CONFIG JS -->
     <script src="config.js"></script>
-
-    <!-- APP SCRIPT & MULTI-LANGUAGE SYSTEM -->
     <script>
-        // Translations Dictionary
-        const TRANSLATIONS = {
-            id: {
-                subtitle: "Portal Hukum & PMI Profesional",
-                loginBtn: "Masuk",
-                loadingText: "Memproses Data...",
-                footerText: "© 2026 HAQ SAUDI Premium Portal. Hak Cipta Dilindungi Undang-Undang.",
-                heroTitle: "Perlindungan Hukum & Keadilan Terpadu di",
-                heroDesc: "Platform resmi yang menghubungkan Pekerja Migran Indonesia (PMI) dengan Advokat Berlisensi resmi di Kerajaan Arab Saudi secara aman, cepat, dan transparan.",
-                workerRegBtn: "Daftar Akun Pekerja",
-                lawyerRegBtn: "Daftar Akun Advokat",
-                loginTitle: "Masuk ke Portal",
-                loginDesc: "Pilih peran Anda dan masukkan kredensial akun.",
-                iqamahLabel: "Nomor Iqamah / Email Admin",
-                passLabel: "Kata Sandi",
-                roleLabel: "Peran Pengguna",
-                workerRole: "Pekerja Migran (PMI)",
-                lawyerRole: "Advokat / Pengacara",
-                adminRole: "Administrator",
-                submitLogin: "Masuk Sekarang"
-            },
-            en: {
-                subtitle: "Professional Legal & Worker Portal",
-                loginBtn: "Login",
-                loadingText: "Processing Data...",
-                footerText: "© 2026 HAQ SAUDI Premium Portal. All Rights Reserved.",
-                heroTitle: "Integrated Legal Protection & Justice in",
-                heroDesc: "The official platform connecting Indonesian Migrant Workers with licensed legal advocates in the Kingdom of Saudi Arabia safely and transparently.",
-                workerRegBtn: "Register as Worker",
-                lawyerRegBtn: "Register as Lawyer",
-                loginTitle: "Portal Login",
-                loginDesc: "Select your role and enter your account credentials.",
-                iqamahLabel: "Iqamah Number / Admin Email",
-                passLabel: "Password",
-                roleLabel: "User Role",
-                workerRole: "Migrant Worker (PMI)",
-                lawyerRole: "Licensed Lawyer",
-                adminRole: "Administrator",
-                submitLogin: "Sign In Now"
-            },
-            ar: {
-                subtitle: "بوابة الحماية القانونية والعمالية",
-                loginBtn: "تسجيل الدخول",
-                loadingText: "جاري معالجة البيانات...",
-                footerText: "© 2026 بوابة حق السعودية المميزة. جميع الحقوق محفوظة.",
-                heroTitle: "الحماية القانونية المتكاملة والعدالة في",
-                heroDesc: "المنصة الرسمية التي تربط العمالة المهاجرة بالمحامين المرخصين في المملكة العربية السعودية بكل أمان وشفافية.",
-                workerRegBtn: "تسجيل حساب عامل",
-                lawyerRegBtn: "تسجيل حساب محامي",
-                loginTitle: "تسجيل الدخول إلى البوابة",
-                loginDesc: "اختر دورك وأدخل بيانات اعتماد حسابك.",
-                iqamahLabel: "رقم الإقامة / البريد الإلكتروني للمشرف",
-                passLabel: "كلمة المرور",
-                roleLabel: "دور المستخدم",
-                workerRole: "عامل مهاجر",
-                lawyerRole: "محامي مرخص",
-                adminRole: "مشرف النظام",
-                submitLogin: "تسجيل الدخول الآن"
-            }
-        };
-
         let currentLang = 'id';
+        let currentUser = null;
 
-        function changeLanguage(lang) {
-            currentLang = lang;
-            const root = document.getElementById('html-root');
-            const bodyDir = document.getElementById('body-dir');
-            
-            if (lang === 'ar') {
-                root.setAttribute('dir', 'rtl');
-                bodyDir.style.fontFamily = "'Amiri', serif";
-            } else {
-                root.setAttribute('dir', 'ltr');
-                bodyDir.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
-            }
-
-            // Update static elements
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (TRANSLATIONS[lang][key]) {
-                    el.innerText = TRANSLATIONS[lang][key];
-                }
-            });
-
-            // Re-render current view to catch dynamic translations if any
-            if (currentView === 'landing') renderLanding();
-            if (currentView === 'login') renderLogin();
-        }
-
-        let currentView = 'landing';
-        const container = document.getElementById('app-container');
-        const loader = document.getElementById('loading-overlay');
-
-        function showLoader() { loader.classList.remove('hidden'); loader.classList.add('flex'); }
-        function hideLoader() { loader.classList.add('hidden'); loader.classList.remove('flex'); }
+        function showLoader() { document.getElementById('loading-overlay').classList.remove('hidden'); document.getElementById('loading-overlay').classList.add('flex'); }
+        function hideLoader() { document.getElementById('loading-overlay').classList.add('hidden'); document.getElementById('loading-overlay').classList.remove('flex'); }
 
         function switchView(viewName, data = null) {
-            currentView = viewName;
             window.scrollTo(0,0);
-            if (viewName === 'landing') renderLanding();
-            else if (viewName === 'login') renderLogin();
-            else if (viewName === 'workerDashboard') renderWorkerDashboard(data);
-            else if (viewName === 'lawyerDashboard') renderLawyerDashboard(data);
-            else if (viewName === 'adminDashboard') renderAdminDashboard(data);
-            else if (viewName === 'registerWorker') renderRegisterWorker();
-            else if (viewName === 'registerLawyer') renderRegisterLawyer();
+            const container = document.getElementById('app-container');
+            if(viewName === 'landing') renderLanding(container);
+            else if(viewName === 'login') renderLogin(container);
+            else if(viewName === 'workerDashboard') renderWorkerDashboard(container, data);
+            else if(viewName === 'lawyerDashboard') renderLawyerDashboard(container, data);
+            else if(viewName === 'adminDashboard') renderAdminDashboard(container, data);
+            else if(viewName === 'consultation') renderConsultation(container, data);
         }
 
-        // ==================== VIEWS RENDERING ====================
-
-        function renderLanding() {
-            const t = TRANSLATIONS[currentLang];
+        function renderLanding(container) {
             container.innerHTML = `
-                <div class="max-w-7xl mx-auto px-4 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center">
+                <div class="max-w-7xl mx-auto px-4 py-20 grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <span class="px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold tracking-widest uppercase mb-6 inline-block border border-amber-300">
-                            Official Saudi Legal Assistance
-                        </span>
+                        <span class="px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold uppercase mb-6 inline-block">Official Saudi Legal Assistance</span>
                         <h2 class="text-4xl lg:text-5xl font-extrabold text-brand-navy leading-tight mb-6">
-                            ${t.heroTitle} <span class="gold-gradient-text font-black">Arab Saudi</span>
+                            Perlindungan Hukum & Keadilan Terpadu di <span class="text-amber-600">Arab Saudi</span>
                         </h2>
-                        <p class="text-lg text-slate-600 mb-8 leading-relaxed font-medium">
-                            ${t.heroDesc}
-                        </p>
-                        <div class="flex flex-wrap gap-4">
-                            <button onclick="switchView('registerWorker')" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg shadow-amber-500/30 transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-user-shield"></i> ${t.workerRegBtn}
-                            </button>
-                            <button onclick="switchView('registerLawyer')" class="bg-brand-navy hover:bg-slate-800 text-white px-6 py-3.5 rounded-xl font-bold shadow-md transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-scale-balanced"></i> ${t.lawyerRegBtn}
-                            </button>
+                        <p class="text-lg text-slate-600 mb-8 font-medium">Terhubung langsung dengan Advokat resmi berlisensi, fitur terjemahan otomatis bahasa Arab-Indonesia, dan konsultasi aman.</p>
+                        <button onclick="switchView('login')" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3.5 rounded-xl font-bold shadow-lg">Mulai Konsultasi & Layanan</button>
+                    </div>
+                    <div class="bg-amber-50 p-8 rounded-3xl border border-amber-200">
+                        <h3 class="text-xl font-bold text-brand-navy mb-4"><i class="fa-solid fa-circle-info mr-2 text-amber-600"></i>Info Akses Admin</h3>
+                        <p class="text-sm text-slate-700 mb-2">Gunakan kredensial berikut untuk masuk sebagai Admin:</p>
+                        <div class="bg-white p-4 rounded-xl border text-sm font-mono space-y-1">
+                            <p><b>Email:</b> muh.restu5@gmail.com</p>
+                            <p><b>Password:</b> admin123</p>
                         </div>
                     </div>
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-amber-300 to-amber-100 rounded-[2.5rem] transform rotate-2 scale-105 z-0 opacity-60"></div>
-                        <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=800" alt="Legal Shield" class="relative z-10 rounded-[2.5rem] shadow-2xl border-4 border-white object-cover h-[450px] w-full">
-                    </div>
-                </div>
-            `;
+                </div>`;
         }
 
-        function renderLogin() {
-            const t = TRANSLATIONS[currentLang];
+        function renderLogin(container) {
             container.innerHTML = `
                 <div class="flex-grow flex items-center justify-center p-4 py-12">
-                    <div class="premium-card rounded-2xl w-full max-w-md p-8 relative overflow-hidden bg-white">
-                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-400 to-amber-600"></div>
-                        <h3 class="text-2xl font-bold text-brand-navy text-center mb-2">${t.loginTitle}</h3>
-                        <p class="text-slate-500 text-center mb-8 text-sm font-medium">${t.loginDesc}</p>
-                        
-                        <form onsubmit="handleLoginSubmit(event)" class="space-y-5">
+                    <div class="bg-white rounded-2xl w-full max-w-md p-8 shadow-xl border border-slate-200">
+                        <h3 class="text-2xl font-bold text-brand-navy text-center mb-2">Masuk ke Portal</h3>
+                        <p class="text-slate-500 text-center mb-8 text-sm">Pilih peran dan masukkan akses akun Anda.</p>
+                        <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">${t.roleLabel}</label>
-                                <select id="loginRole" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500 font-medium">
-                                    <option value="worker">${t.workerRole}</option>
-                                    <option value="lawyer">${t.lawyerRole}</option>
-                                    <option value="admin">${t.adminRole}</option>
+                                <label class="block text-sm font-bold text-slate-700 mb-1">Peran Pengguna</label>
+                                <select id="loginRole" class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-medium">
+                                    <option value="worker">Pekerja Migran (PMI)</option>
+                                    <option value="lawyer">Advokat / Pengacara</option>
+                                    <option value="admin">Administrator</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">${t.iqamahLabel}</label>
-                                <input type="text" id="loginIqamah" required class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500 font-medium" placeholder="2xxxxxxxx0 / admin@...">
+                                <label class="block text-sm font-bold text-slate-700 mb-1">Nomor Iqamah / Email Admin</label>
+                                <input type="text" id="loginIqamah" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="Nomor Iqamah atau Email">
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">${t.passLabel}</label>
-                                <input type="password" id="loginPassword" required class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500 font-medium" placeholder="••••••••">
+                                <label class="block text-sm font-bold text-slate-700 mb-1">Kata Sandi</label>
+                                <input type="password" id="loginPassword" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="••••••••">
                             </div>
-                            <button type="submit" class="w-full bg-brand-navy hover:bg-slate-800 text-white font-bold rounded-xl px-4 py-3.5 shadow-lg transition-all mt-4">
-                                ${t.submitLogin}
-                            </button>
+                            <button type="submit" class="w-full bg-brand-navy text-white font-bold rounded-xl py-3.5 shadow-lg mt-2">Masuk Sekarang</button>
                         </form>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
-        function renderRegisterWorker() {
-            container.innerHTML = `
-                <div class="max-w-2xl mx-auto p-4 py-12 w-full">
-                    <div class="premium-card rounded-2xl p-8 bg-white">
-                        <h3 class="text-2xl font-bold text-brand-navy mb-6 border-b pb-4">Registrasi Pekerja Migran (PMI)</h3>
-                        <form onsubmit="handleWorkerRegSubmit(event)" class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label class="block text-sm font-semibold mb-1">Nama Lengkap</label><input type="text" id="rwName" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">Nomor Iqamah</label><input type="text" id="rwIqamah" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">Email</label><input type="email" id="rwEmail" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">No Telepon</label><input type="tel" id="rwPhone" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">Kata Sandi</label><input type="password" id="rwPassword" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">Tempat Kerja</label><input type="text" id="rwWorkplace" class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                            </div>
-                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl py-3.5 mt-4 shadow-md">Daftar Sekarang</button>
-                        </form>
-                    </div>
-                </div>
-            `;
-        }
+        function renderWorkerDashboard(container, user) {
+            currentUser = user;
+            let expiryWarning = '';
+            if (user.daysLeft <= 30 && user.daysLeft > 0) {
+                expiryWarning = `<div class="bg-amber-100 border-l-4 border-amber-500 p-4 mb-6 rounded-r-xl text-amber-900 font-semibold text-sm">⚠️ Peringatan: Masa aktif akun Anda akan habis dalam ${user.daysLeft} hari lagi. Segera lakukan perpanjangan pembayaran sebesar 99 SAR/tahun.</div>`;
+            } else if (user.isExpired) {
+                expiryWarning = `<div class="bg-red-100 border-l-4 border-red-500 p-4 mb-6 rounded-r-xl text-red-900 font-semibold text-sm">❌ Masa aktif akun Anda telah habis. Silakan lakukan pembayaran 99 SAR/tahun untuk membuka kembali fitur penuh.</div>`;
+            }
 
-        function renderRegisterLawyer() {
             container.innerHTML = `
-                <div class="max-w-2xl mx-auto p-4 py-12 w-full">
-                    <div class="premium-card rounded-2xl p-8 bg-white">
-                        <h3 class="text-2xl font-bold text-brand-navy mb-6 border-b pb-4">Registrasi Advokat Profesional</h3>
-                        <form onsubmit="handleLawyerRegSubmit(event)" class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label class="block text-sm font-semibold mb-1">Nama Lengkap</label><input type="text" id="rlName" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">Nomor Iqamah</label><input type="text" id="rlIqamah" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">Email</label><input type="email" id="rlEmail" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">No Telepon</label><input type="tel" id="rlPhone" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">Kata Sandi</label><input type="password" id="rlPassword" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                                <div><label class="block text-sm font-semibold mb-1">Nomor Lisensi</label><input type="text" id="rlLicense" required class="w-full border rounded-xl px-4 py-2.5 outline-none focus:border-amber-500"></div>
-                            </div>
-                            <button type="submit" class="w-full bg-brand-navy hover:bg-slate-800 text-white font-bold rounded-xl py-3.5 mt-4 shadow-md">Daftar Sebagai Advokat</button>
-                        </form>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderWorkerDashboard(user) {
-            container.innerHTML = `
-                <div class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow flex flex-col gap-6">
-                    <div class="bg-brand-navy rounded-2xl p-6 md:p-8 text-white shadow-xl flex justify-between items-center border border-amber-500/30">
+                <div class="max-w-5xl mx-auto px-4 py-8 w-full flex flex-col gap-6">
+                    ${expiryWarning}
+                    <div class="bg-brand-navy rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
                         <div>
-                            <h2 class="text-2xl font-bold mb-1">Ahlan wa Sahlan, ${user.name}</h2>
-                            <p class="text-slate-300 text-sm"><i class="fa-regular fa-id-card mr-2"></i>Iqamah: ${user.iqamah}</p>
+                            <h2 class="text-2xl font-bold">Ahlan, ${user.name}</h2>
+                            <p class="text-slate-300 text-sm">Iqamah: ${user.iqamah} | Status Bayar: <b>${user.paymentStatus}</b></p>
                         </div>
-                        <button onclick="switchView('landing')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow">Keluar</button>
+                        <button onclick="switchView('landing')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold">Keluar</button>
                     </div>
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="premium-card rounded-2xl p-6 bg-white shadow-sm hover:shadow-md transition">
-                            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl mb-4 font-bold">⚖️</div>
-                            <h3 class="font-bold text-slate-900 mb-2">Buka Kasus Hukum</h3>
-                            <p class="text-sm text-slate-500">Ajukan sengketa ketenagakerjaan atau konsultasi hukum.</p>
-                        </div>
-                        <div class="premium-card rounded-2xl p-6 bg-white shadow-sm hover:shadow-md transition">
-                            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-4 font-bold">📁</div>
-                            <h3 class="font-bold text-slate-900 mb-2">Dokumen Saya</h3>
-                            <p class="text-sm text-slate-500">Unggah paspor, kontrak kerja, dan dokumen pendukung.</p>
-                        </div>
-                        <div class="premium-card rounded-2xl p-6 bg-white shadow-sm hover:shadow-md transition">
-                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4 font-bold">💳</div>
-                            <h3 class="font-bold text-slate-900 mb-2">Status Pembayaran</h3>
-                            <p class="text-sm text-slate-500">Kelola langganan dan verifikasi pembayaran layanan.</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderLawyerDashboard(user) {
-            container.innerHTML = `
-                <div class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow flex flex-col gap-6">
-                    <div class="bg-brand-navy rounded-2xl p-6 md:p-8 text-white shadow-xl flex justify-between items-center border border-amber-500/30">
-                        <div>
-                            <h2 class="text-2xl font-bold mb-1">Advokat Portal: ${user.name}</h2>
-                            <p class="text-amber-400 text-sm font-semibold"><i class="fa-solid fa-certificate mr-2"></i>Status: Terverifikasi / Aktif</p>
-                        </div>
-                        <button onclick="switchView('landing')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow">Keluar</button>
-                    </div>
+                    
                     <div class="grid md:grid-cols-2 gap-6">
-                        <div class="premium-card rounded-2xl p-6 bg-white">
-                            <h3 class="font-bold text-lg text-brand-navy mb-2">Daftar Kasus Masuk</h3>
-                            <p class="text-slate-500 text-sm">Kelola dan tangani kasus klien PMI yang ditugaskan kepada Anda.</p>
+                        <div class="bg-white p-6 rounded-2xl shadow border">
+                            <h3 class="font-bold text-lg mb-2 text-brand-navy">💬 Konsultasi & Pesan Hukum</h3>
+                            <p class="text-sm text-slate-500 mb-4">Kirim pesan langsung ke pengacara. Terjemahan otomatis Bahasa Indonesia ke Arab aktif!</p>
+                            <button onclick="switchView('consultation', {user: currentUser, partnerId: 'LAW001', partnerName: 'Advokat Abdullah (Lawyer)'})" class="bg-brand-navy text-white px-4 py-2.5 rounded-xl text-sm font-bold">Buka Ruang Pesan</button>
                         </div>
-                        <div class="premium-card rounded-2xl p-6 bg-white">
-                            <h3 class="font-bold text-lg text-brand-navy mb-2">Konsultasi Klien</h3>
-                            <p class="text-slate-500 text-sm">Balas pesan dan jadwalkan sesi konsultasi hukum.</p>
+                        <div class="bg-white p-6 rounded-2xl shadow border">
+                            <h3 class="font-bold text-lg mb-2 text-brand-navy">💳 Pembayaran Tahunan (99 SAR)</h3>
+                            <p class="text-sm text-slate-500 mb-4">Biaya langganan perlindungan hukum setahun penuh (Manual Transfer).</p>
+                            <button onclick="openPaymentModal()" class="bg-amber-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold">Kirim Bukti Bayar 99 SAR</button>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
-        function renderAdminDashboard(user) {
+        function renderLawyerDashboard(container, user) {
+            currentUser = user;
             container.innerHTML = `
-                <div class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow flex flex-col gap-6">
-                    <div class="bg-brand-navy rounded-2xl p-6 md:p-8 text-white shadow-xl flex justify-between items-center border border-amber-500/30">
+                <div class="max-w-5xl mx-auto px-4 py-8 w-full flex flex-col gap-6">
+                    <div class="bg-brand-navy rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
                         <div>
-                            <h2 class="text-2xl font-bold mb-1">Super Administrator Portal</h2>
-                            <p class="text-amber-400 text-sm">Kontrol penuh sistem basis data dan verifikasi.</p>
+                            <h2 class="text-2xl font-bold">Advokat Portal: ${user.name}</h2>
+                            <p class="text-amber-400 text-sm">Nomor Lisensi Aktif</p>
                         </div>
-                        <button onclick="switchView('landing')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow">Keluar</button>
+                        <button onclick="switchView('landing')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold">Keluar</button>
                     </div>
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="premium-card rounded-2xl p-6 bg-white">
-                            <h3 class="font-bold text-brand-navy mb-2">Verifikasi Pembayaran</h3>
-                            <p class="text-sm text-slate-500 mb-4">Setujui bukti transfer atau pembayaran langganan PMI.</p>
-                        </div>
-                        <div class="premium-card rounded-2xl p-6 bg-white">
-                            <h3 class="font-bold text-brand-navy mb-2">Kelola Pengguna</h3>
-                            <p class="text-sm text-slate-500 mb-4">Manajemen data Pekerja Migran dan Advokat.</p>
-                        </div>
-                        <div class="premium-card rounded-2xl p-6 bg-white">
-                            <h3 class="font-bold text-brand-navy mb-2">Pengaturan Sistem</h3>
-                            <p class="text-sm text-slate-500 mb-4">Konfigurasi database Google Sheets & Drive.</p>
-                        </div>
+                    <div class="bg-white p-6 rounded-2xl shadow border">
+                        <h3 class="font-bold text-lg mb-2 text-brand-navy">📥 Kotak Masuk Klien (PMI)</h3>
+                        <p class="text-sm text-slate-500 mb-4">Pesan masuk dari pekerja akan otomatis diterjemahkan dari bahasa Indonesia ke Arab.</p>
+                        <button onclick="switchView('consultation', {user: currentUser, partnerId: '2xxxxxxxx0', partnerName: 'Pekerja Klien'})" class="bg-brand-navy text-white px-4 py-2.5 rounded-xl text-sm font-bold">Buka Ruang Pesan Klien</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
-        // ==================== API CONTROLLERS ====================
+        function renderAdminDashboard(container, user) {
+            currentUser = user;
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto px-4 py-8 w-full flex flex-col gap-6">
+                    <div class="bg-brand-navy rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
+                        <div>
+                            <h2 class="text-2xl font-bold">Panel Administrator</h2>
+                            <p class="text-amber-400 text-sm">Laporan pembayaran dan manajemen sistem.</p>
+                        </div>
+                        <button onclick="switchView('landing')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold">Keluar</button>
+                    </div>
+                    <div id="admin-reports-content" class="bg-white p-6 rounded-2xl shadow border">
+                        <p class="text-slate-500">Memuat laporan...</p>
+                    </div>
+                </div>`;
+            loadAdminData();
+        }
+
+        function loadAdminData() {
+            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminReports' }) })
+            .then(res => res.json())
+            .then(res => {
+                let html = `<h3 class="font-bold text-lg text-brand-navy mb-4">Laporan Pembayaran & Langganan 99 SAR</h3>`;
+                if(res.payments && res.payments.length > 0) {
+                    html += `<div class="overflow-x-auto"><table class="w-full text-left text-sm border-collapse"><thead class="bg-slate-100 border-b"><tr><th class="p-3">Iqamah</th><th class="p-3">Nama</th><th class="p-3">Jumlah</th><th class="p-3">Bukti</th><th class="p-3">Status</th><th class="p-3">Aksi</th></tr></thead><tbody>`;
+                    res.payments.forEach(p => {
+                        html += `<tr class="border-b"><td class="p-3">${p.iqamah}</td><td class="p-3">${p.name}</td><td class="p-3">${p.amount} SAR</td><td class="p-3"><a href="${p.receipt}" target="_blank" class="text-blue-600 underline">Lihat File</a></td><td class="p-3 font-semibold">${p.status}</td><td class="p-3"><button onclick="verifyPayment('${p.iqamah}', 'approve')" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold">Setujui</button></td></tr>`;
+                    });
+                    html += `</tbody></table></div>`;
+                } else {
+                    html += `<p class="text-slate-500 text-sm">Belum ada data pembayaran masuk.</p>`;
+                }
+                document.getElementById('admin-reports-content').innerHTML = html;
+            });
+        }
+
+        function verifyPayment(iqamah, adminAction) {
+            showLoader();
+            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'verifyPaymentAdmin', iqamah, adminAction }) })
+            .then(res => res.json())
+            .then(res => { hideLoader(); alert(res.message); loadAdminData(); });
+        }
+
+        function renderConsultation(container, data) {
+            const partnerId = data.partnerId;
+            const partnerName = data.partnerName;
+            const targetLang = currentUser.role === 'worker' ? 'ar' : 'id';
+
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto px-4 py-8 w-full flex flex-col h-[80vh]">
+                    <div class="bg-brand-navy text-white p-4 rounded-t-2xl flex justify-between items-center">
+                        <h3 class="font-bold">Konsultasi dengan: ${partnerName}</h3>
+                        <button onclick="switchView('${currentUser.role}Dashboard', currentUser)" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg">Kembali</button>
+                    </div>
+                    <div id="chat-box" class="flex-grow bg-white border-x border-slate-200 p-4 overflow-y-auto space-y-4 flex flex-col">
+                        <p class="text-center text-xs text-slate-400">Pesan otomatis diterjemahkan (${currentUser.role === 'worker' ? 'ID ➔ AR' : 'AR ➔ ID'})</p>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-b-2xl border border-slate-200 flex gap-2 items-center">
+                        <input type="file" id="chatFile" class="hidden" onchange="uploadChatFile(this)">
+                        <button onclick="document.getElementById('chatFile').click()" class="bg-slate-200 hover:bg-slate-300 px-3 py-3 rounded-xl text-slate-700" title="Lampirkan JPG / PDF"><i class="fa-solid fa-paperclip"></i></button>
+                        <input type="text" id="chatInput" placeholder="Ketik pesan..." class="flex-grow bg-white border rounded-xl px-4 py-3 text-sm outline-none">
+                        <button onclick="sendChatMessage('${partnerId}', '${targetLang}')" class="bg-brand-navy text-white px-6 py-3 rounded-xl font-bold">Kirim</button>
+                    </div>
+                </div>`;
+            fetchMessages(partnerId);
+        }
+
+        function fetchMessages(partnerId) {
+            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'getMessages', userIqamah: currentUser.iqamah, partnerIqamah: partnerId }) })
+            .then(res => res.json())
+            .then(res => {
+                const box = document.getElementById('chat-box');
+                if(!box) return;
+                let html = `<p class="text-center text-xs text-slate-400">Riwayat Percakapan</p>`;
+                if(res.chats) {
+                    res.chats.forEach(c => {
+                        let isMe = c.senderIqamah === currentUser.iqamah;
+                        html += `<div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                            <div class="max-w-md p-3 rounded-xl text-sm ${isMe ? 'bg-brand-navy text-white' : 'bg-slate-200 text-slate-900'}">
+                                <p>${c.message}</p>
+                                <p class="text-xs opacity-75 mt-1 italic">Terjemahan: ${c.translated}</p>
+                                ${c.attachment ? `<a href="${c.attachment}" target="_blank" class="block text-xs underline mt-1 text-amber-300">Lihat Lampiran File</a>` : ''}
+                            </div>
+                        </div>`;
+                    });
+                }
+                box.innerHTML = html;
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function sendChatMessage(partnerId, targetLang) {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            showLoader();
+            fetch(CONFIG.API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'sendMessage',
+                    senderIqamah: currentUser.iqamah,
+                    senderRole: currentUser.role,
+                    receiverIqamah: partnerId,
+                    message: msg,
+                    targetLang: targetLang,
+                    attachmentLink: ''
+                })
+            }).then(() => {
+                hideLoader();
+                input.value = '';
+                fetchMessages(partnerId);
+            });
+        }
+
+        function uploadChatFile(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            showLoader();
+            reader.onload = function(e) {
+                fetch(CONFIG.API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'uploadFile',
+                        base64: e.target.result,
+                        contentType: file.type,
+                        folderName: 'Case Files',
+                        fileName: file.name
+                    })
+                }).then(res => res.json()).then(res => {
+                    hideLoader();
+                    if(res.success) {
+                        // Kirim otomatis sebagai pesan dengan lampiran
+                        fetch(CONFIG.API_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                action: 'sendMessage',
+                                senderIqamah: currentUser.iqamah,
+                                senderRole: currentUser.role,
+                                receiverIqamah: 'LAW001',
+                                message: '[Mengunggah Berkas Lampiran: ' + file.name + ']',
+                                targetLang: currentUser.role === 'worker' ? 'ar' : 'id',
+                                attachmentLink: res.fileLink
+                            })
+                        }).then(() => fetchMessages('LAW001'));
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openPaymentModal() {
+            let receiptUrl = prompt("Masukkan Link Bukti Bayar (Google Drive / Gambar yang sudah di-upload):");
+            if(!receiptUrl) return;
+            showLoader();
+            fetch(CONFIG.API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'submitPayment',
+                    iqamah: currentUser.iqamah,
+                    name: currentUser.name,
+                    receiptLink: receiptUrl
+                })
+            }).then(res => res.json()).then(res => { hideLoader(); alert(res.message); });
+        }
 
         function handleLoginSubmit(e) {
             e.preventDefault();
@@ -408,80 +353,20 @@
             const password = document.getElementById('loginPassword').value;
 
             showLoader();
-            fetch(CONFIG.API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'login', role, iqamah, password })
-            })
+            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', role, iqamah, password }) })
             .then(res => res.json())
             .then(res => {
                 hideLoader();
-                if (res.success) {
-                    if (res.role === 'worker') switchView('workerDashboard', res);
-                    else if (res.role === 'lawyer') switchView('lawyerDashboard', res);
-                    else if (res.role === 'admin') switchView('adminDashboard', res);
-                } else {
-                    alert('Login Gagal: ' + res.message);
-                }
-            })
-            .catch(err => {
-                hideLoader();
-                // Fallback demo mode jika URL belum di-deploy penuh
-                if(role === 'admin') {
-                    switchView('adminDashboard', { name: 'Admin' });
-                } else {
-                    alert('Koneksi Server Gagal. Pastikan URL CONFIG.JS valid.');
-                }
+                if(res.success) {
+                    if(res.role === 'worker') switchView('workerDashboard', res);
+                    else if(res.role === 'lawyer') switchView('lawyerDashboard', res);
+                    else if(res.role === 'admin') switchView('adminDashboard', res);
+                } else { alert(res.message); }
             });
         }
 
-        function handleWorkerRegSubmit(e) {
-            e.preventDefault();
-            const data = {
-                action: 'registerWorker',
-                name: document.getElementById('rwName').value,
-                iqamah: document.getElementById('rwIqamah').value,
-                email: document.getElementById('rwEmail').value,
-                phone: document.getElementById('rwPhone').value,
-                password: document.getElementById('rwPassword').value,
-                workplace: document.getElementById('rwWorkplace').value
-            };
-            showLoader();
-            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify(data) })
-            .then(res => res.json())
-            .then(res => {
-                hideLoader();
-                alert(res.message);
-                if (res.success) switchView('login');
-            })
-            .catch(() => { hideLoader(); alert('Registrasi berhasil disimulasikan.'); switchView('login'); });
-        }
-
-        function handleLawyerRegSubmit(e) {
-            e.preventDefault();
-            const data = {
-                action: 'registerLawyer',
-                name: document.getElementById('rlName').value,
-                iqamah: document.getElementById('rlIqamah').value,
-                email: document.getElementById('rlEmail').value,
-                phone: document.getElementById('rlPhone').value,
-                password: document.getElementById('rlPassword').value,
-                license: document.getElementById('rlLicense').value
-            };
-            showLoader();
-            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify(data) })
-            .then(res => res.json())
-            .then(res => {
-                hideLoader();
-                alert(res.message);
-                if (res.success) switchView('login');
-            })
-            .catch(() => { hideLoader(); alert('Registrasi advokat berhasil disimulasikan.'); switchView('login'); });
-        }
-
-        // Initialize App on Load
-        document.addEventListener('DOMContentLoaded', () => {
-            renderLanding();
-        });
+        function changeLanguage(lang) { currentLang = lang; }
+        document.addEventListener('DOMContentLoaded', () => switchView('landing', document.getElementById('app-container')));
     </script>
 </body>
 </html>
