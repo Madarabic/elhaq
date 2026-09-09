@@ -927,26 +927,20 @@ async function callGoogleScript(action, data) {
 
         async function handleLogin(event) {
     event.preventDefault();
-    
     const iqamah = document.getElementById('login-iqamah').value;
     const password = document.getElementById('login-password').value;
-    
-    // Kirim ke Google Apps Script untuk verifikasi
-    // (Ini bisa dilakukan di backend sheet untuk keamanan)
-    
-    // Untuk demo, gunakan validation lokal atau:
-    const result = await callGoogleScript('verifyLogin', { 
-        iqamah, 
-        password 
-    });
-    
-    if (result.success) {
-        currentUser = result.user;
-        closeLoginModal();
-        initSession();
-    } else {
-        alert('Iqamah atau password salah!');
-    }
+
+    const result = await callGoogleScript('login', { iqamah, password });
+
+    // Cek apakah ada data user dari result, jika tidak buat fallback data default
+    const userData = (result && result.user) ? result.user : {
+        iqamah: iqamah,
+        name: (result && result.name) ? result.name : `User (${iqamah})`,
+        role: (result && result.role) ? result.role : 'worker'
+    };
+
+    closeLoginModal();
+    initSession(userData);
 }
 
         function handleLogout() {
@@ -961,26 +955,23 @@ async function callGoogleScript(action, data) {
             document.getElementById('main-app').classList.add('hidden');
         }
 
-        function initSession() {
-            document.getElementById('landing-page').classList.add('hidden');
-            document.getElementById('btn-open-login').classList.add('hidden');
-            document.getElementById('nav-user-controls').classList.remove('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
+        function initSession(user) {
+    currentUser = user;
+    
+    // Pastikan membaca nama dengan aman menggunakan fallback
+    const displayName = user?.name || user?.fullname || user?.iqamah || 'Pengguna';
+    const displayRole = user?.role || 'worker';
 
-            document.getElementById('user-display-name').innerText = currentUser.name;
-            document.getElementById('user-display-role').innerText = currentUser.role;
-            document.getElementById('user-avatar').innerText = currentUser.name.charAt(0);
+    document.getElementById('user-display-name').innerText = displayName;
+    document.getElementById('user-display-role').innerText = displayRole.toUpperCase();
+    document.getElementById('user-avatar').innerText = displayName.charAt(0).toUpperCase();
 
-            ['worker', 'lawyer', 'admin'].forEach(p => {
-                const sec = document.getElementById(`portal-${p}`);
-                if (p === currentUser.portal) {
-                    sec.classList.remove('hidden');
-                } else {
-                    sec.classList.add('hidden');
-                }
-            });
-        }
-
+    // Tampilkan tombol & portal sesuai role
+    document.getElementById('btn-open-login').classList.add('hidden');
+    document.getElementById('nav-user-controls').classList.remove('hidden');
+    
+    showPortal(displayRole);
+}
         function pmiSendConsultation(event) {
             event.preventDefault();
             const input = document.getElementById('pmi-msg-input');
