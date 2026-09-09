@@ -58,7 +58,6 @@
         let currentUser = null;
         let currentLang = 'id';
 
-        // DICTIONARY 3 BAHASA (REAL)
         const i18n = {
             id: {
                 subtitle: "Portal Hukum & Ketenagakerjaan",
@@ -93,8 +92,8 @@
                 payment_desc: "Aktivasi layanan perlindungan hukum setahun penuh. Lakukan transfer manual dan lampirkan bukti pembayaran.",
                 btn_upload_receipt: "Kirim Bukti Bayar 99 SAR",
                 chat_title: "💬 Ruang Pesan & Konsultasi",
-                chat_desc: "Kirim pesan dan unggah berkas (JPG/PDF). Terjemahan otomatis aktif real-time.",
-                btn_open_chat: "Buka Ruang Pesan",
+                chat_desc: "Pilih pengacara pilihan Anda untuk memulai konsultasi langsung.",
+                btn_open_chat: "Pilih Pengacara & Konsultasi",
                 logout: "Keluar"
             },
             ar: {
@@ -130,8 +129,8 @@
                 payment_desc: "تفعيل الحماية القانونية لمدة عام كامل. قم بالتحويل اليدوي وارفع الإيصال.",
                 btn_upload_receipt: "إرسال إيصال الدفع (99 ريال)",
                 chat_title: "💬 غرفة المحادثة والاستشارات",
-                chat_desc: "أرسل الرسائل وارفع المستندات (JPG/PDF). الترجمة الفورية مفعلة.",
-                btn_open_chat: "فتح المحادثة",
+                chat_desc: "اختر المحامي المناسب لبدء الاستشارة المباشرة.",
+                btn_open_chat: "اختر محامياً وابدأ الاستشارة",
                 logout: "تسجيل الخروج"
             },
             en: {
@@ -167,8 +166,8 @@
                 payment_desc: "Full year legal protection activation. Perform manual transfer and attach your payment receipt.",
                 btn_upload_receipt: "Submit 99 SAR Receipt",
                 chat_title: "💬 Consultation & Messages",
-                chat_desc: "Send messages and upload files (JPG/PDF). Real-time translation active.",
-                btn_open_chat: "Open Chat Room",
+                chat_desc: "Select your desired lawyer to start a direct consultation session.",
+                btn_open_chat: "Select Lawyer & Chat",
                 logout: "Logout"
             }
         };
@@ -204,6 +203,7 @@
             else if(viewName === 'workerDashboard') renderWorkerDashboard(container, data);
             else if(viewName === 'lawyerDashboard') renderLawyerDashboard(container, data);
             else if(viewName === 'adminDashboard') renderAdminDashboard(container, data);
+            else if(viewName === 'selectLawyer') renderSelectLawyer(container, data);
             else if(viewName === 'consultation') renderConsultation(container, data);
             changeSystemLanguage(currentLang);
         }
@@ -335,21 +335,81 @@
                     </div>
                     
                     <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-2xl shadow border">
-                            <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="chat_title">💬 Konsultasi & Pesan Hukum</h3>
-                            <p class="text-sm text-slate-500 mb-4" data-i18n="chat_desc">Kirim pesan dan konsultasi dengan pengacara berlisensi dengan terjemahan 3 bahasa aktif!</p>
-                            <button onclick="switchView('consultation', {user: currentUser, partnerId: 'LAW001', partnerName: 'Advokat Abdullah (Lawyer)'})" class="bg-brand-navy text-white px-4 py-2.5 rounded-xl text-sm font-bold" data-i18n="btn_open_chat">Buka Ruang Pesan</button>
+                        <div class="bg-white p-6 rounded-2xl shadow border flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="chat_title">💬 Konsultasi & Pesan Hukum</h3>
+                                <p class="text-sm text-slate-500 mb-4" data-i18n="chat_desc">Pilih pengacara pilihan Anda dari daftar pengacara berlisensi resmi.</p>
+                            </div>
+                            <button onclick="switchView('selectLawyer')" class="bg-brand-navy text-white px-4 py-3 rounded-xl text-sm font-bold text-center shadow" data-i18n="btn_open_chat">Pilih Pengacara & Konsultasi</button>
                         </div>
-                        <div class="bg-white p-6 rounded-2xl shadow border">
-                            <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="payment_title">💳 Pembayaran Tahunan (99 SAR)</h3>
-                            <p class="text-sm text-slate-500 mb-4" data-i18n="payment_desc">Biaya langganan perlindungan hukum setahun penuh via transfer manual.</p>
-                            <button onclick="openPaymentModal()" class="bg-amber-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold" data-i18n="btn_upload_receipt">Kirim Bukti Bayar 99 SAR</button>
+                        <div class="bg-white p-6 rounded-2xl shadow border flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="payment_title">💳 Pembayaran Tahunan (99 SAR)</h3>
+                                <p class="text-sm text-slate-500 mb-4" data-i18n="payment_desc">Biaya langganan perlindungan hukum setahun penuh via transfer manual.</p>
+                            </div>
+                            <button onclick="openPaymentModal()" class="bg-amber-500 text-white px-4 py-3 rounded-xl text-sm font-bold text-center shadow" data-i18n="btn_upload_receipt">Kirim Bukti Bayar 99 SAR</button>
                         </div>
                     </div>
                 </div>`;
         }
 
-        // LAWYER DASHBOARD: DAFTAR KLIEN TERPISAH DENGAN MUTABA'AH (LIVE MONITORING)
+        // TAMPILAN PILIH PENGACARA UNTUK PEKERJA (WORKER)
+        function renderSelectLawyer(container) {
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto px-4 py-8 w-full flex flex-col gap-6">
+                    <div class="flex items-center justify-between bg-white p-6 rounded-2xl shadow border">
+                        <div>
+                            <h2 class="text-xl font-bold text-brand-navy">⚖️ Pilih Pengacara Berlisensi</h2>
+                            <p class="text-xs text-slate-500 mt-1">Pilih salah satu advokat di bawah ini untuk memulai sesi konsultasi hukum personal.</p>
+                        </div>
+                        <button onclick="switchView('workerDashboard', currentUser)" class="text-xs bg-slate-100 hover:bg-slate-200 text-brand-navy font-bold px-4 py-2 rounded-xl">Kembali</button>
+                    </div>
+                    <div id="lawyers-list-container" class="grid md:grid-cols-2 gap-4">
+                        <p class="text-slate-500 text-sm">Memuat daftar pengacara...</p>
+                    </div>
+                </div>`;
+            loadAvailableLawyers();
+        }
+
+        function loadAvailableLawyers() {
+            const container = document.getElementById('lawyers-list-container');
+            if(!container) return;
+
+            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'getLawyersList' }) })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success && res.lawyers && res.lawyers.length > 0) {
+                    let html = '';
+                    res.lawyers.forEach(l => {
+                        html += `
+                            <div class="bg-white p-6 rounded-2xl shadow border flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-brand-navy text-amber-400 flex items-center justify-center font-bold">
+                                            <i class="fa-solid fa-user-tie"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-brand-navy text-base">${l.name}</h4>
+                                            <p class="text-xs text-slate-500">Lisensi: ${l.license || 'Resmi'}</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-slate-600 mb-4">Firm: ${l.lawFirm || 'Saudi Legal Practice'} | Tel: ${l.phone}</p>
+                                </div>
+                                <button onclick="switchView('consultation', {user: currentUser, partnerId: '${l.iqamah}', partnerName: '${l.name}'})" class="w-full bg-brand-navy text-white text-xs font-bold py-3 rounded-xl shadow">
+                                    Konsultasi dengan ${l.name} <i class="fa-solid fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>`;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `<div class="col-span-2 p-8 text-center bg-white rounded-xl border text-slate-500 text-sm">Belum ada pengacara yang terdaftar dalam sistem saat ini.</div>`;
+                }
+            }).catch(() => {
+                container.innerHTML = `<p class="text-red-500 text-sm">Gagal memuat daftar pengacara.</p>`;
+            });
+        }
+
+        // LAWYER DASHBOARD: DAFTAR KLIEN TERPISAH (MUTABA'AH / LIVE TRACKING)
         function renderLawyerDashboard(container, user) {
             currentUser = user;
             container.innerHTML = `
@@ -357,17 +417,17 @@
                     <div class="bg-brand-navy rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
                         <div>
                             <h2 class="text-2xl font-bold">Advokat Portal: ${user.name}</h2>
-                            <p class="text-amber-400 text-sm">Lisensi Praktik Aktif | Sistem Pemantauan Kasus (Mutaba'ah)</p>
+                            <p class="text-amber-400 text-sm">Lisensi Praktik Aktif | Sistem Pemantauan Kasus Klien (Mutaba'ah)</p>
                         </div>
                         <button onclick="switchView('landing')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold" data-i18n="logout">Keluar</button>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow border">
                         <div class="flex justify-between items-center mb-4">
                             <div>
-                                <h3 class="font-bold text-lg text-brand-navy">📋 Daftar Klien & Ruang Pesan Terpisah</h3>
-                                <p class="text-sm text-slate-500">Pilih salah satu klien di bawah untuk membuka ruang konsultasi dan memantau kasusnya secara mutaba'ah (real-time).</p>
+                                <h3 class="font-bold text-lg text-brand-navy">📋 Daftar Klien Masuk & Ruang Pesan Terpisah</h3>
+                                <p class="text-sm text-slate-500">Pilih salah satu klien di bawah ini untuk membuka ruang konsultasi dan memantau kasusnya secara mutaba'ah (real-time).</p>
                             </div>
-                            <button onclick="loadLawyerClientsList()" class="bg-slate-100 hover:bg-slate-200 text-brand-navy text-xs font-bold px-3 py-2 rounded-lg border"><i class="fa-solid fa-rotate"></i> Muat Ulang Klien</button>
+                            <button onclick="loadLawyerClientsList()" class="bg-slate-100 hover:bg-slate-200 text-brand-navy text-xs font-bold px-3 py-2 rounded-lg border"><i class="fa-solid fa-rotate"></i> Muat Ulang</button>
                         </div>
                         <div id="lawyer-clients-container" class="space-y-3">
                             <p class="text-slate-500 text-sm">Memuat daftar klien...</p>
@@ -395,11 +455,11 @@
                             <div class="border rounded-xl p-4 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition">
                                 <div>
                                     <h4 class="font-bold text-brand-navy text-base">${c.name}</h4>
-                                    <p class="text-xs text-slate-500">Iqamah: <span class="font-semibold text-slate-700">${c.iqamah}</span></p>
+                                    <p class="text-xs text-slate-500">Iqamah Klien: <span class="font-semibold text-slate-700">${c.iqamah}</span></p>
                                     <p class="text-xs text-slate-600 mt-1 truncate max-w-md"><b>Pesan Terakhir:</b> ${c.lastMessage}</p>
                                 </div>
                                 <button onclick="switchView('consultation', {user: currentUser, partnerId: '${c.iqamah}', partnerName: '${c.name}'})" class="bg-brand-navy text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow">
-                                    Buka Konsultasi <i class="fa-solid fa-arrow-right ml-1"></i>
+                                    Buka Ruang Pesan <i class="fa-solid fa-arrow-right ml-1"></i>
                                 </button>
                             </div>`;
                     });
@@ -408,11 +468,11 @@
                 } else {
                     container.innerHTML = `
                         <div class="p-8 text-center bg-slate-50 border rounded-xl">
-                            <p class="text-slate-500 text-sm mb-3">Belum ada klien atau pesan masuk yang terdaftar dalam sistem mutaba'ah.</p>
-                            <p class="text-xs text-slate-400">Jika klien mengirim pesan baru dari akun mereka, daftar klien akan otomatis muncul di sini.</p>
+                            <p class="text-slate-500 text-sm mb-3">Belum ada klien yang mengirim pesan kepada Anda dalam sistem mutaba'ah.</p>
+                            <p class="text-xs text-slate-400">Saat pekerja memilih nama Anda dan mengirim pesan konsultasi, ruang obrolan klien akan otomatis muncul di sini.</p>
                         </div>`;
                 }
-            }).catch(err => {
+            }).catch(() => {
                 container.innerHTML = `<p class="text-red-500 text-sm">Gagal memuat daftar klien.</p>`;
             });
         }
@@ -472,14 +532,14 @@
                     <div class="bg-brand-navy text-white p-4 rounded-t-2xl flex justify-between items-center shadow">
                         <div>
                             <h3 class="font-bold">Konsultasi: ${partnerName}</h3>
-                            <p class="text-xs text-amber-300">ID Partner: ${partnerId} (Mutaba'ah Aktif)</p>
+                            <p class="text-xs text-amber-300">ID Partner: ${partnerId} (Mutaba'ah & Terjemahan Aktif)</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs text-amber-300">Terjemahan Target:</span>
+                            <span class="text-xs text-amber-300">Target:</span>
                             <select id="chatTargetLang" class="bg-slate-800 text-white text-xs rounded px-2 py-1 font-bold">
-                                <option value="ar">Bahasa Arab 🇸🇦</option>
-                                <option value="id">Bahasa Indonesia 🇮🇩</option>
-                                <option value="en">English 🇬🇧</option>
+                                <option value="ar">Arab 🇸🇦</option>
+                                <option value="id">Indo 🇮🇩</option>
+                                <option value="en">EN 🇬🇧</option>
                             </select>
                             <button onclick="switchView('${backDashboard}', currentUser)" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg ml-2">Kembali</button>
                         </div>
