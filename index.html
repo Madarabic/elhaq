@@ -1,40 +1,49 @@
 <!DOCTYPE html>
-<html lang="id" id="html-root">
+<html lang="id" id="html-root" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAQ SAUDI - Enterprise Legal Portal</title>
+    <title>HAQ SAUDI - Portal Solidaritas & Bantuan Pekerja</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { brand: { navy: '#0B192C', gold: '#D4AF37' } }, fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], arabic: ['Amiri', 'serif'] } } }
+            theme: { 
+                extend: { 
+                    colors: { brand: { navy: '#0B192C', gold: '#D4AF37' } }, 
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], arabic: ['Amiri', 'serif'] } 
+                } 
+            }
         }
     </script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between" id="body-dir">
 
     <!-- HEADER -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/90">
         <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('landing')">
-                <div class="w-12 h-12 bg-brand-navy rounded-xl flex items-center justify-center shadow-md">
-                    <i class="fa-solid fa-scale-balanced text-amber-400 text-xl"></i>
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="navigateHome()">
+                <div class="w-12 h-12 bg-brand-navy rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition">
+                    <i class="fa-solid fa-hands-holding-circle text-amber-400 text-xl"></i>
                 </div>
                 <div>
                     <h1 class="text-xl font-extrabold text-brand-navy tracking-tight">HAQ <span class="text-amber-600">SAUDI</span></h1>
-                    <p class="text-xs text-slate-500 font-medium" data-i18n="subtitle">Portal Hukum & Ketenagakerjaan</p>
+                    <p class="text-xs text-slate-500 font-medium" data-i18n="subtitle">Portal Solidaritas & Bantuan Sesama Pekerja</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <select id="globalLangSelector" onchange="changeSystemLanguage(this.value)" class="bg-slate-100 border text-xs font-bold rounded-lg px-2.5 py-2">
+                <select id="globalLangSelector" onchange="changeSystemLanguage(this.value)" class="bg-slate-100 border text-xs font-bold rounded-lg px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-brand-navy cursor-pointer">
                     <option value="id">🇮🇩 ID</option>
                     <option value="ar">🇸🇦 AR</option>
                     <option value="en">🇬🇧 EN</option>
+                    <option value="ur">🇵🇰 UR</option>
+                    <option value="ru">🇷🇺 RU</option>
                 </select>
-                <button onclick="switchView('register')" class="text-brand-navy font-bold text-sm px-4 py-2 hover:bg-slate-100 rounded-xl transition" data-i18n="nav_register">Daftar Akun</button>
-                <button onclick="switchView('login')" class="bg-brand-navy text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md" data-i18n="nav_login">Masuk</button>
+                <div id="headerAuthButtons" class="flex items-center gap-2">
+                    <button onclick="switchView('register')" class="text-brand-navy font-bold text-sm px-4 py-2 hover:bg-slate-100 rounded-xl transition" data-i18n="nav_register">Daftar Akun</button>
+                    <button onclick="switchView('login')" class="bg-brand-navy text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-slate-800 transition" data-i18n="nav_login">Masuk</button>
+                </div>
             </div>
         </div>
     </header>
@@ -44,30 +53,53 @@
 
     <!-- FOOTER -->
     <footer class="bg-brand-navy text-white py-6 border-t border-amber-500/30 text-center text-sm">
-        <p>© 2026 HAQ SAUDI Enterprise Portal. <span data-i18n="footer_rights">Hak Cipta Dilindungi.</span></p>
+        <p>© 2026 HAQ SAUDI Solidarity Portal. <span data-i18n="footer_rights">Gotong Royong Bantu Sesama Saudara Pekerja.</span></p>
     </footer>
 
     <!-- LOADING SPINNER -->
     <div id="loading-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center">
         <div class="w-14 h-14 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-white font-bold mt-4" data-i18n="loading">Memproses Data...</p>
+        <p class="text-white font-bold mt-4" data-i18n="loading">Memproses Data Gotong Royong...</p>
     </div>
 
-    <script src="config.js"></script>
+    <!-- MODAL PEMBAYARAN 99 SAR -->
+    <div id="paymentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[90] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-brand-navy" data-i18n="payment_title">💳 Kontribusi Gotong Royong (99 SAR)</h3>
+                <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-600 mb-4" data-i18n="payment_desc">Dana gotong royong tahunan untuk operasional bantuan hukum sesama pekerja. Lakukan transfer dan lampirkan bukti.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1" data-i18n="upload_label">Unggah Bukti Transfer (Gambar / PDF)</label>
+                    <input type="file" id="paymentReceiptFile" accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-navy file:text-white hover:file:bg-slate-800 border rounded-xl p-2 bg-slate-50">
+                </div>
+                <button onclick="submitPaymentProof()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl py-3 text-sm shadow-md transition" data-i18n="btn_upload_receipt">Kirim Bukti Kontribusi 99 SAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA KONEKSI BACKEND & 5 BAHASA (VVIP +++++ MODE TERJEMAHAN LANJUTAN) -->
     <script>
+        const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+
         let currentUser = null;
         let currentLang = 'id';
+        let activePartnerIqamah = null;
+        let activePartnerName = null;
+        let chatPollInterval = null;
 
         const i18n = {
             id: {
-                subtitle: "Portal Hukum & Ketenagakerjaan",
+                subtitle: "Portal Solidaritas & Bantuan Sesama Pekerja",
                 nav_register: "Daftar Akun",
                 nav_login: "Masuk",
-                footer_rights: "Hak Cipta Dilindungi.",
+                footer_rights: "Gotong Royong Bantu Sesama Saudara Pekerja.",
                 loading: "Memproses Data...",
-                landing_badge: "Portal Resmi Hukum Arab Saudi",
-                landing_title: "Solusi Hukum & Konsultasi PMI Terpadu",
-                landing_desc: "Platform profesional berkeamanan tinggi yang menghubungkan pekerja migran dengan advokat berlisensi resmi, lengkap dengan mesin terjemahan 3 bahasa instan.",
+                landing_badge: "Gerakan Solidaritas & Bantuan Sesama Pekerja",
+                landing_title: "Ruang Gotong Royong & Advokasi Sesama Pekerja",
+                landing_desc: "Inisiatif mandiri untuk saling melindungi dan membantu sesama saudara pekerja migran, didukung fitur terjemahan instan multi-gaya VVIP.",
                 login_title: "Masuk ke Portal",
                 login_desc: "Pilih peran dan masukkan kredensial akun Anda.",
                 role_worker: "Pekerja Migran (PMI)",
@@ -79,7 +111,7 @@
                 no_account: "Belum punya akun?",
                 register_here: "Daftar di sini",
                 register_title: "Pendaftaran Akun Baru",
-                register_desc: "Lengkapi data diri untuk pendaftaran sistem.",
+                register_desc: "Lengkapi data diri untuk bergabung dengan jaringan solidaritas.",
                 fullname: "Nama Lengkap",
                 iqamah_no: "Nomor Iqamah",
                 email: "Email",
@@ -88,27 +120,35 @@
                 license_no: "Nomor Lisensi Advokat",
                 btn_register: "Daftar Akun",
                 have_account: "Sudah punya akun?",
-                payment_title: "💳 Pembayaran Tahunan 99 SAR",
-                payment_desc: "Aktivasi layanan perlindungan hukum setahun penuh. Lakukan transfer manual dan lampirkan bukti pembayaran.",
-                btn_upload_receipt: "Kirim Bukti Bayar 99 SAR",
-                chat_title: "💬 Ruang Pesan & Konsultasi",
-                chat_desc: "Pilih pengacara pilihan Anda untuk memulai konsultasi langsung.",
-                btn_open_chat: "Pilih Pengacara & Konsultasi",
-                logout: "Keluar"
+                payment_title: "💳 Kontribusi Gotong Royong (99 SAR)",
+                payment_desc: "Aktivasi dukungan dan pemeliharaan server operasional sesama pekerja. Lakukan transfer dan lampirkan bukti.",
+                upload_label: "Unggah Bukti Transfer (Gambar / PDF)",
+                btn_upload_receipt: "Kirim Bukti Kontribusi 99 SAR",
+                chat_title: "💬 Ruang Obrolan & Bantuan Hukum",
+                chat_desc: "Pilih rekan pengacara atau sesama relawan untuk berkonsultasi.",
+                btn_open_chat: "Pilih Rekan & Mulai Diskusi",
+                logout: "Keluar",
+                select_lawyer_title: "⚖️ Pilih Relawan / Advokat Pendamping",
+                select_lawyer_desc: "Pilih pendamping di bawah ini untuk memulai sesi diskusi atau bantuan hukum personal.",
+                back: "Kembali",
+                target_lang: "Bahasa Tujuan:",
+                trans_mode: "Gaya Terjemahan:",
+                chat_placeholder: "Ketik pesan diskusi atau konsultasi...",
+                send: "Kirim"
             },
             ar: {
-                subtitle: "بوابة الشؤون القانونية والعمالية",
+                subtitle: "بوابة التضامن ومساعدة العمالة الوافدة",
                 nav_register: "إنشاء حساب",
                 nav_login: "تسجيل الدخول",
-                footer_rights: "جميع الحقوق محفوظة.",
+                footer_rights: "التعاون المشترك لمساعدة إخواننا العمال.",
                 loading: "جاري معالجة البيانات...",
-                landing_badge: "البوابة الرسمية للنظام القانوني السعودي",
-                landing_title: "الحلول القانونية واستشارات العمالة الوافدة",
-                landing_desc: "منصة احترافية تربط العمالة بالمحامين المعتمدين مع محرك ترجمة فوري ثلاثي اللغات.",
+                landing_badge: "حركة التضامن ومساعدة العمال",
+                landing_title: "منصة التضامن والدعم المتبادل بين العمال",
+                landing_desc: "مبادرة ذاتية لحماية ومساعدة إخواننا العمال الوافدين، مدعومة بمحرك ترجمة فوري متعدد الأنماط.",
                 login_title: "تسجيل الدخول إلى البوابة",
                 login_desc: "اختر الدور وأدخل بيانات الاعتماد الخاصة بك.",
                 role_worker: "عامل وافد (PMI)",
-                role_lawyer: "محامي معتمد",
+                role_lawyer: "محامي / مستشار معتمد",
                 role_admin: "مدير النظام",
                 iqamah_label: "رقم الإقامة / بريد المشرف",
                 pass_label: "كلمة المرور",
@@ -116,7 +156,7 @@
                 no_account: "ليس لديك حساب؟",
                 register_here: "سجل من هنا",
                 register_title: "تسجيل حساب جديد",
-                register_desc: "أدخل بياناتك المطلوبة للتسجيل في النظام.",
+                register_desc: "أدخل بياناتك المطلوبة للانضمام إلى شبكة التضامن.",
                 fullname: "الاسم الكامل",
                 iqamah_no: "رقم الإقامة",
                 email: "البريد الإلكتروني",
@@ -125,27 +165,35 @@
                 license_no: "رقم رخصة المحاماة",
                 btn_register: "إتمام التسجيل",
                 have_account: "لديك حساب بالفعل؟",
-                payment_title: "💳 الاشتراك السنوي (99 ريال)",
-                payment_desc: "تفعيل الحماية القانونية لمدة عام كامل. قم بالتحويل اليدوي وارفع الإيصال.",
-                btn_upload_receipt: "إرسال إيصال الدفع (99 ريال)",
-                chat_title: "💬 غرفة المحادثة والاستشارات",
-                chat_desc: "اختر المحامي المناسب لبدء الاستشارة المباشرة.",
-                btn_open_chat: "اختر محامياً وابدأ الاستشارة",
-                logout: "تسجيل الخروج"
+                payment_title: "💳 مساهمة التضامن (99 ريال)",
+                payment_desc: "دعم استمرارية تشغيل النظام لمساعدة العمال. قم بالتحويل اليدوي وارفع الإيصال.",
+                upload_label: "رفع إيصال التحويل (صورة أو ملف PDF)",
+                btn_upload_receipt: "إرسال إيصال المساهمة (99 ريال)",
+                chat_title: "💬 غرفة الدردشة والمساعدة القانونية",
+                chat_desc: "اختر المحامي أو المتطوع المناسب لبدء الاستشارة.",
+                btn_open_chat: "اختر متعاوناً وابدأ النقاش",
+                logout: "تسجيل الخروج",
+                select_lawyer_title: "⚖️ اختر مستشاراً أو محامياً متطوعاً",
+                select_lawyer_desc: "اختر أحد الزملاء أدناه لبدء جلسة النقاش أو المساعدة الشخصية.",
+                back: "رجوع",
+                target_lang: "لغة الهدف:",
+                trans_mode: "نمط الترجمة:",
+                chat_placeholder: "اكتب رسالة النقاش أو الاستشارة...",
+                send: "إرسال"
             },
             en: {
-                subtitle: "Legal & Labor Enterprise Portal",
+                subtitle: "Workers Solidarity & Mutual Aid Portal",
                 nav_register: "Register",
                 nav_login: "Login",
-                footer_rights: "All Rights Reserved.",
+                footer_rights: "Mutual Aid and Brotherhood Among Workers.",
                 loading: "Processing Data...",
-                landing_badge: "Official Saudi Legal Portal",
-                landing_title: "Integrated Legal & Migrant Worker Solutions",
-                landing_desc: "Secure professional platform connecting migrant workers with licensed lawyers, featuring instant 3-language translation.",
+                landing_badge: "Workers Solidarity & Mutual Aid Movement",
+                landing_title: "Mutual Aid & Support Network for Workers",
+                landing_desc: "A grassroots initiative to protect and assist fellow migrant workers, powered by advanced multi-style instant translation.",
                 login_title: "Portal Login",
                 login_desc: "Select your role and enter your credentials.",
                 role_worker: "Migrant Worker (PMI)",
-                role_lawyer: "Licensed Lawyer",
+                role_lawyer: "Advocate / Lawyer",
                 role_admin: "Administrator",
                 iqamah_label: "Iqamah Number / Admin Email",
                 pass_label: "Password",
@@ -153,7 +201,7 @@
                 no_account: "Don't have an account?",
                 register_here: "Register here",
                 register_title: "New Account Registration",
-                register_desc: "Fill in your credentials to join the system.",
+                register_desc: "Fill in your details to join the solidarity network.",
                 fullname: "Full Name",
                 iqamah_no: "Iqamah Number",
                 email: "Email Address",
@@ -162,37 +210,181 @@
                 license_no: "Lawyer License Number",
                 btn_register: "Register Account",
                 have_account: "Already have an account?",
-                payment_title: "💳 Annual Subscription (99 SAR)",
-                payment_desc: "Full year legal protection activation. Perform manual transfer and attach your payment receipt.",
-                btn_upload_receipt: "Submit 99 SAR Receipt",
-                chat_title: "💬 Consultation & Messages",
-                chat_desc: "Select your desired lawyer to start a direct consultation session.",
-                btn_open_chat: "Select Lawyer & Chat",
-                logout: "Logout"
+                payment_title: "💳 Solidarity Contribution (99 SAR)",
+                payment_desc: "Support operational upkeep for peer worker assistance. Transfer manually and attach receipt.",
+                upload_label: "Upload Transfer Receipt (Image / PDF)",
+                btn_upload_receipt: "Submit 99 SAR Contribution",
+                chat_title: "💬 Discussion & Legal Support Room",
+                chat_desc: "Select a lawyer or peer volunteer for direct guidance.",
+                btn_open_chat: "Select Partner & Discuss",
+                logout: "Logout",
+                select_lawyer_title: "⚖️ Select Companion / Volunteer Lawyer",
+                select_lawyer_desc: "Choose one of the advocates below to start your mutual aid consultation.",
+                back: "Back",
+                target_lang: "Target Lang:",
+                trans_mode: "Translation Style:",
+                chat_placeholder: "Type your message or discussion...",
+                send: "Send"
+            },
+            ur: {
+                subtitle: "ورکرز سالیڈیرٹی اینڈ میچوئل ایڈ پورٹل",
+                nav_register: "رجستر کریں",
+                nav_login: "لاگ ان",
+                footer_rights: "محنت کش بھائیوں کی باہمی مدد کا پلیٹ فارم۔",
+                loading: "ڈیٹا پروسیس ہو رہا ہے...",
+                landing_badge: "ورکرز سالیڈیرٹی اینڈ میچوئل ایڈ موومنٹ",
+                landing_title: "محنت کشوں کی باہمی مدد اور یکجہتی کا نیٹ ورک",
+                landing_desc: "ساتھی تارکین وطن کارکنوں کی حفاظت اور مدد کے لیے ایک خود مختار اقدام، جدید ملٹی اسٹائل ترجمہ کے ساتھ۔",
+                login_title: "پورٹل لاگ ان",
+                login_desc: "اپنا کردار منتخب کریں اور اسناد درج کریں۔",
+                role_worker: "مبارز کارکن (PMI)",
+                role_lawyer: "وکیل / مشیر",
+                role_admin: "ایڈمنسٹریٹر",
+                iqamah_label: "اقامہ نمبر / ایڈمن ای میل",
+                pass_label: "پاس ورڈ",
+                btn_login: "ابھی لاگ ان کریں",
+                no_account: "اکاؤنٹ نہیں ہے؟",
+                register_here: "یہاں رجسٹر کریں",
+                register_title: "نیا اکاؤنٹ رجسٹریشن",
+                register_desc: "یکجہتی نیٹ ورک میں شامل ہونے کے لیے اپنی تفصیلات درج کریں۔",
+                fullname: "पूरा نام / پورا نام",
+                iqamah_no: "اقامہ نمبر",
+                email: "ای میل ایڈریس",
+                phone: "فون نمبر",
+                workplace: "کام کی جگہ / کفیل",
+                license_no: "وکیل لائسنس نمبر",
+                btn_register: "اکاؤنٹ رجسٹر کریں",
+                have_account: "پہلے سے اکاؤنٹ ہے؟",
+                payment_title: "💳 یکجہتی تعاون (99 SAR)",
+                payment_desc: "ساتھی کارکنوں کی مدد کے نظام کے اخراجات میں حصہ لیں۔ دستی منتقلی کریں اور رسید منسلک کریں۔",
+                upload_label: "منتقلی کی رسید اپ لوڈ کریں (تصویر / PDF)",
+                btn_upload_receipt: "99 SAR تعاون جمع کروائیں",
+                chat_title: "💬 ڈسکشن اور قانونی مدد کا کمرہ",
+                chat_desc: "براہ راست رہنمائی کے لیے وکیل یا رضا کار کا انتخاب کریں۔",
+                btn_open_chat: "ساتھی منتخب کریں اور بات چیت کریں",
+                logout: "لاگ آؤٹ",
+                select_lawyer_title: "⚖️ وکیل یا رضا کار کا انتخاب کریں",
+                select_lawyer_desc: "اپنی باہمی مدد کی مشاورت شروع کرنے کے لیے درج ذیل میں سے کسی ایک کا انتخاب کریں۔",
+                back: "واپس",
+                target_lang: "ہدف زبان:",
+                trans_mode: "ترجمہ کا انداز:",
+                chat_placeholder: "اپنا پیغام یا مشاورت درج کریں...",
+                send: "بھیجیں"
+            },
+            ru: {
+                subtitle: "Портал солидарности и взаимопомощи трудящихся",
+                nav_register: "Регистрация",
+                nav_login: "Вход",
+                footer_rights: "Взаимопомощь и братство среди работников.",
+                loading: "Обработка данных...",
+                landing_badge: "Движение солидарности и взаимопомощи трудящихся",
+                landing_title: "Сеть взаимопомощи и поддержки работников",
+                landing_desc: "Инициатива для защиты и поддержки соотечественников и мигрантов, оснащенная продвинутыми стилями перевода.",
+                login_title: "Вход в портал",
+                login_desc: "Выберите роль и введите свои учетные данные.",
+                role_worker: "Трудовой мигрант (PMI)",
+                role_lawyer: "Адвокат / Консультант",
+                role_admin: "Администратор",
+                iqamah_label: "Номер Икамы / Email администратора",
+                pass_label: "Пароль",
+                btn_login: "Войти сейчас",
+                no_account: "Нет аккаунта?",
+                register_here: "Зарегистрироваться",
+                register_title: "Регистрация нового аккаунта",
+                register_desc: "Заполните данные для присоединения к сети солидарности.",
+                fullname: "Полное имя",
+                iqamah_no: "Номер Икамы",
+                email: "Электронная почта",
+                phone: "Номер телефона",
+                workplace: "Место работы / Спонсор",
+                license_no: "Номер лицензии адвоката",
+                btn_register: "Зарегистрировать аккаунт",
+                have_account: "Уже есть аккаунт?",
+                payment_title: "💳 Взносы солидарности (99 SAR)",
+                payment_desc: "Поддержка работы системы взаимопомощи. Выполните ручной перевод и прикрепите квитанцию.",
+                upload_label: "Загрузить квитанцию перевода (Изображение / PDF)",
+                btn_upload_receipt: "Отправить квитанцию 99 SAR",
+                chat_title: "💬 Комната обсуждений и правовой поддержки",
+                chat_desc: "Выберите адвоката или волонтера для получения консультации.",
+                btn_open_chat: "Выбрать партнера и начать",
+                logout: "Выйти",
+                select_lawyer_title: "⚖️ Выберите добровольца или адвоката",
+                select_lawyer_desc: "Выберите одного из специалистов ниже для начала консультации.",
+                back: "Назад",
+                target_lang: "Целевой язык:",
+                trans_mode: "Стиль перевода:",
+                chat_placeholder: "Введите текст обсуждения...",
+                send: "Отправить"
             }
+        };
+
+        const translationStyles = {
+            id: { formal: "Formal & Profesional", friendly: "Santai & Persuasive", legal: "Pasal & Yuridis Resmi" },
+            ar: { formal: "رسمي ومهني", friendly: "ودي ومباشر", legal: "مادة قانونية نظامية" },
+            en: { formal: "Formal & Professional", friendly: "Friendly & Casual", legal: "Legal & Statutory" },
+            ur: { formal: "رسمی اور پیشہ ورانہ", friendly: "دوستانہ اور آسان", legal: "قانونی اور آئینی" },
+            ru: { formal: "Официальный и профессиональный", friendly: "Дружеский и простой", legal: "Юридический и нормативный" }
         };
 
         function changeSystemLanguage(lang) {
             currentLang = lang;
             const root = document.getElementById('html-root');
             const bodyDir = document.getElementById('body-dir');
-            if(lang === 'ar') {
+            
+            if(lang === 'ar' || lang === 'ur') {
                 root.setAttribute('dir', 'rtl');
-                root.setAttribute('lang', 'ar');
-                bodyDir.style.fontFamily = "'Amiri', serif, 'Plus Jakarta Sans', sans-serif";
+                root.setAttribute('lang', lang);
+                bodyDir.style.fontFamily = lang === 'ar' ? "'Amiri', serif, 'Plus Jakarta Sans', sans-serif" : "'Plus Jakarta Sans', sans-serif";
             } else {
                 root.setAttribute('dir', 'ltr');
                 root.setAttribute('lang', lang);
                 bodyDir.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
             }
+            
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if(i18n[lang][key]) el.innerText = i18n[lang][key];
             });
+
+            const sel = document.getElementById('globalLangSelector');
+            if(sel) sel.value = lang;
         }
 
-        function showLoader() { document.getElementById('loading-overlay').classList.remove('hidden'); document.getElementById('loading-overlay').classList.add('flex'); }
-        function hideLoader() { document.getElementById('loading-overlay').classList.add('hidden'); document.getElementById('loading-overlay').classList.remove('flex'); }
+        function showLoader() { 
+            document.getElementById('loading-overlay').classList.remove('hidden'); 
+            document.getElementById('loading-overlay').classList.add('flex'); 
+        }
+        
+        function hideLoader() { 
+            document.getElementById('loading-overlay').classList.add('hidden'); 
+            document.getElementById('loading-overlay').classList.remove('flex'); 
+        }
+
+        function navigateHome() {
+            if(currentUser) {
+                if(currentUser.role === 'worker') switchView('workerDashboard', currentUser);
+                else if(currentUser.role === 'lawyer') switchView('lawyerDashboard', currentUser);
+                else if(currentUser.role === 'admin') switchView('adminDashboard', currentUser);
+            } else {
+                switchView('landing');
+            }
+        }
+
+        function updateHeaderNav() {
+            const container = document.getElementById('headerAuthButtons');
+            if(!container) return;
+            if(currentUser) {
+                container.innerHTML = `
+                    <span class="text-xs font-bold text-brand-navy hidden md:inline">Halo, ${currentUser.name}</span>
+                    <button onclick="logoutSession()" class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition" data-i18n="logout">${i18n[currentLang].logout}</button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="switchView('register')" class="text-brand-navy font-bold text-sm px-4 py-2 hover:bg-slate-100 rounded-xl transition" data-i18n="nav_register">${i18n[currentLang].nav_register}</button>
+                    <button onclick="switchView('login')" class="bg-brand-navy text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-slate-800 transition" data-i18n="nav_login">${i18n[currentLang].nav_login}</button>
+                `;
+            }
+        }
 
         function switchView(viewName, data = null) {
             window.scrollTo(0,0);
@@ -205,24 +397,36 @@
             else if(viewName === 'adminDashboard') renderAdminDashboard(container, data);
             else if(viewName === 'selectLawyer') renderSelectLawyer(container, data);
             else if(viewName === 'consultation') renderConsultation(container, data);
+            
+            updateHeaderNav();
             changeSystemLanguage(currentLang);
         }
 
+        function logoutSession() {
+            currentUser = null;
+            activePartnerIqamah = null;
+            activePartnerName = null;
+            if(chatPollInterval) clearInterval(chatPollInterval);
+            switchView('landing');
+        }
+
+        // ================= RENDER HALAMAN LANDING =================
         function renderLanding(container) {
             container.innerHTML = `
                 <div class="max-w-5xl mx-auto px-4 py-24 text-center">
-                    <span class="px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold uppercase mb-6 inline-block" data-i18n="landing_badge">Portal Resmi Hukum Arab Saudi</span>
+                    <span class="px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold uppercase mb-6 inline-block" data-i18n="landing_badge">Gerakan Solidaritas & Bantuan Sesama Pekerja</span>
                     <h2 class="text-4xl lg:text-5xl font-extrabold text-brand-navy leading-tight mb-6" data-i18n="landing_title">
-                        Solusi Hukum & Konsultasi PMI Terpadu
+                        Ruang Gotong Royong & Advokasi Sesama Pekerja
                     </h2>
-                    <p class="text-lg text-slate-600 mb-10 max-w-2xl mx-auto font-medium" data-i18n="landing_desc">Platform profesional berkeamanan tinggi yang menghubungkan pekerja migran dengan advokat berlisensi resmi.</p>
+                    <p class="text-lg text-slate-600 mb-10 max-w-2xl mx-auto font-medium" data-i18n="landing_desc">Inisiatif mandiri untuk saling melindungi dan membantu sesama saudara pekerja migran, didukung fitur terjemahan instan multi-gaya VVIP.</p>
                     <div class="flex justify-center gap-4">
-                        <button onclick="switchView('login')" class="bg-brand-navy text-white px-8 py-3.5 rounded-xl font-bold shadow-lg" data-i18n="nav_login">Masuk ke Akun</button>
-                        <button onclick="switchView('register')" class="bg-amber-500 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg" data-i18n="nav_register">Daftar Baru</button>
+                        <button onclick="switchView('login')" class="bg-brand-navy text-white px-8 py-3.5 rounded-xl font-bold shadow-lg hover:bg-slate-800 transition" data-i18n="nav_login">Masuk ke Akun</button>
+                        <button onclick="switchView('register')" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg transition" data-i18n="nav_register">Daftar Baru</button>
                     </div>
                 </div>`;
         }
 
+        // ================= RENDER HALAMAN LOGIN =================
         function renderLogin(container) {
             container.innerHTML = `
                 <div class="flex-grow flex items-center justify-center p-4 py-12">
@@ -232,7 +436,7 @@
                         <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="role_worker">Peran Pengguna</label>
-                                <select id="loginRole" class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-medium">
+                                <select id="loginRole" class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-navy">
                                     <option value="worker" data-i18n="role_worker">Pekerja Migran (PMI)</option>
                                     <option value="lawyer" data-i18n="role_lawyer">Advokat / Pengacara</option>
                                     <option value="admin" data-i18n="role_admin">Administrator</option>
@@ -240,19 +444,48 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="iqamah_label">Nomor Iqamah / Email Admin</label>
-                                <input type="text" id="loginIqamah" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="Contoh: 2xxxxxxxx0">
+                                <input type="text" id="loginIqamah" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" placeholder="Contoh: 2xxxxxxxx0">
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="pass_label">Kata Sandi</label>
-                                <input type="password" id="loginPassword" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="••••••••">
+                                <input type="password" id="loginPassword" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" placeholder="••••••••">
                             </div>
-                            <button type="submit" class="w-full bg-brand-navy text-white font-bold rounded-xl py-3.5 shadow-lg mt-2" data-i18n="btn_login">Masuk Sekarang</button>
+                            <button type="submit" class="w-full bg-brand-navy hover:bg-slate-800 text-white font-bold rounded-xl py-3.5 shadow-lg mt-2 transition" data-i18n="btn_login">Masuk Sekarang</button>
                         </form>
                         <p class="text-center text-xs text-slate-500 mt-6"><span data-i18n="no_account">Belum punya akun?</span> <a href="#" onclick="switchView('register')" class="text-amber-600 font-bold underline" data-i18n="register_here">Daftar di sini</a></p>
                     </div>
                 </div>`;
         }
 
+        async function handleLoginSubmit(event) {
+            event.preventDefault();
+            showLoader();
+            const role = document.getElementById('loginRole').value;
+            const iqamah = document.getElementById('loginIqamah').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', role, iqamah, password })
+                });
+                const res = await response.json();
+                hideLoader();
+                if(res.success) {
+                    currentUser = res;
+                    if(role === 'admin') switchView('adminDashboard', res);
+                    else if(role === 'lawyer') switchView('lawyerDashboard', res);
+                    else switchView('workerDashboard', res);
+                } else {
+                    alert('Login Gagal: ' + (res.message || 'Periksa kembali kredensial Anda.'));
+                }
+            } catch(e) {
+                hideLoader();
+                alert('Terjadi kesalahan jaringan saat menghubungkan ke server.');
+            }
+        }
+
+        // ================= RENDER HALAMAN REGISTER =================
         function renderRegister(container) {
             container.innerHTML = `
                 <div class="flex-grow flex items-center justify-center p-4 py-12">
@@ -262,38 +495,38 @@
                         <form onsubmit="handleRegisterSubmit(event)" class="space-y-4">
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1">Daftar Sebagai</label>
-                                <select id="regRole" onchange="toggleRegFields(this.value)" class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-medium">
+                                <select id="regRole" onchange="toggleRegFields(this.value)" class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-navy">
                                     <option value="worker" data-i18n="role_worker">Pekerja Migran (PMI)</option>
                                     <option value="lawyer" data-i18n="role_lawyer">Advokat / Pengacara</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="fullname">Nama Lengkap</label>
-                                <input type="text" id="regName" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="Nama lengkap">
+                                <input type="text" id="regName" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" placeholder="Nama lengkap">
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="iqamah_no">Nomor Iqamah</label>
-                                <input type="text" id="regIqamah" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="Nomor Iqamah resmi">
+                                <input type="text" id="regIqamah" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" placeholder="Nomor Iqamah resmi">
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="email">Email</label>
-                                    <input type="email" id="regEmail" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="email@domain.com">
+                                    <input type="email" id="regEmail" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" placeholder="email@domain.com">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="phone">No Telepon</label>
-                                    <input type="tel" id="regPhone" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="+9665xxxxxxxx">
+                                    <input type="tel" id="regPhone" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" placeholder="+9665xxxxxxxx">
                                 </div>
                             </div>
                             <div id="extraFieldContainer">
                                 <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="workplace">Tempat Kerja</label>
-                                <input type="text" id="regExtra" class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="Nama perusahaan">
+                                <input type="text" id="regExtra" class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" placeholder="Nama perusahaan">
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1" data-i18n="pass_label">Kata Sandi</label>
-                                <input type="password" id="regPassword" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm" placeholder="••••••••">
+                                <input type="password" id="regPassword" required class="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" placeholder="••••••••">
                             </div>
-                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl py-3.5 shadow-lg mt-2" data-i18n="btn_register">Daftar Akun</button>
+                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl py-3.5 shadow-lg mt-2 transition" data-i18n="btn_register">Daftar Akun</button>
                         </form>
                         <p class="text-center text-xs text-slate-500 mt-6"><span data-i18n="have_account">Sudah punya akun?</span> <a href="#" onclick="switchView('login')" class="text-brand-navy font-bold underline" data-i18n="nav_login">Masuk</a></p>
                     </div>
@@ -307,20 +540,58 @@
                 label.setAttribute('data-i18n', 'license_no');
                 label.innerText = i18n[currentLang]['license_no'] || "Nomor Lisensi Advokat";
                 input.placeholder = "Nomor izin praktik resmi";
+                input.id = "regLicense";
             } else {
                 label.setAttribute('data-i18n', 'workplace');
                 label.innerText = i18n[currentLang]['workplace'] || "Tempat Kerja";
                 input.placeholder = "Nama perusahaan / majikan";
+                input.id = "regWorkplace";
             }
         }
 
+        async function handleRegisterSubmit(event) {
+            event.preventDefault();
+            showLoader();
+            const role = document.getElementById('regRole').value;
+            const data = {
+                action: 'register',
+                role: role,
+                name: document.getElementById('regName').value,
+                iqamah: document.getElementById('regIqamah').value,
+                email: document.getElementById('regEmail').value,
+                phone: document.getElementById('regPhone').value,
+                password: document.getElementById('regPassword').value,
+                workplace: role === 'worker' ? document.getElementById('regWorkplace').value : '',
+                license: role === 'lawyer' ? document.getElementById('regLicense').value : ''
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                const res = await response.json();
+                hideLoader();
+                if(res.success) {
+                    alert(res.message || 'Pendaftaran berhasil! Silakan masuk.');
+                    switchView('login');
+                } else {
+                    alert('Registrasi Gagal: ' + res.message);
+                }
+            } catch(e) {
+                hideLoader();
+                alert('Terjadi kesalahan jaringan.');
+            }
+        }
+
+        // ================= WORKER DASHBOARD =================
         function renderWorkerDashboard(container, user) {
             currentUser = user;
             let expiryWarning = '';
             if (user.daysLeft <= 30 && user.daysLeft > 0) {
-                expiryWarning = `<div class="bg-amber-100 border-l-4 border-amber-500 p-4 mb-6 rounded-r-xl text-amber-900 font-semibold text-sm">⚠️ Peringatan: Masa aktif akun Anda akan berakhir dalam ${user.daysLeft} hari. Silakan perpanjang pembayaran 99 SAR/tahun.</div>`;
+                expiryWarning = `<div class="bg-amber-100 border-l-4 border-amber-500 p-4 mb-6 rounded-r-xl text-amber-900 font-semibold text-sm">⚠️ Peringatan: Masa aktif kontribusi Anda akan berakhir dalam ${user.daysLeft} hari. Silakan perpanjang kontribusi 99 SAR/tahun.</div>`;
             } else if (user.isExpired) {
-                expiryWarning = `<div class="bg-red-100 border-l-4 border-red-500 p-4 mb-6 rounded-r-xl text-red-900 font-semibold text-sm">❌ Masa aktif akun Anda telah habis. Harap lakukan pembayaran 99 SAR/tahun untuk mengaktifkan kembali layanan penuh.</div>`;
+                expiryWarning = `<div class="bg-red-100 border-l-4 border-red-500 p-4 mb-6 rounded-r-xl text-red-900 font-semibold text-sm">❌ Masa aktif kontribusi Anda telah habis. Harap lakukan konfirmasi kontribusi 99 SAR untuk mengaktifkan kembali fitur penuh.</div>`;
             }
 
             container.innerHTML = `
@@ -329,43 +600,43 @@
                     <div class="bg-brand-navy rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
                         <div>
                             <h2 class="text-2xl font-bold">Ahlan, ${user.name}</h2>
-                            <p class="text-slate-300 text-sm">Iqamah: ${user.iqamah} | Status: <b>${user.paymentStatus}</b> | Sisa Masa Aktif: <b>${user.daysLeft} Hari</b></p>
+                            <p class="text-slate-300 text-sm">Iqamah: ${user.iqamah} | Status: <b>${user.paymentStatus}</b> | Sisa Masa Gotong Royong: <b>${user.daysLeft} Hari</b></p>
                         </div>
-                        <button onclick="switchView('landing')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold" data-i18n="logout">Keluar</button>
+                        <button onclick="logoutSession()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition" data-i18n="logout">Keluar</button>
                     </div>
-                    
+
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow border flex flex-col justify-between">
                             <div>
-                                <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="chat_title">💬 Konsultasi & Pesan Hukum</h3>
-                                <p class="text-sm text-slate-500 mb-4" data-i18n="chat_desc">Pilih pengacara pilihan Anda dari daftar pengacara berlisensi resmi.</p>
+                                <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="chat_title">💬 Ruang Obrolan & Bantuan Hukum</h3>
+                                <p class="text-sm text-slate-500 mb-4" data-i18n="chat_desc">Pilih rekan pengacara atau sesama relawan untuk berkonsultasi.</p>
                             </div>
-                            <button onclick="switchView('selectLawyer')" class="bg-brand-navy text-white px-4 py-3 rounded-xl text-sm font-bold text-center shadow" data-i18n="btn_open_chat">Pilih Pengacara & Konsultasi</button>
+                            <button onclick="switchView('selectLawyer')" class="bg-brand-navy hover:bg-slate-800 text-white px-4 py-3 rounded-xl text-sm font-bold text-center shadow transition" data-i18n="btn_open_chat">Pilih Rekan & Mulai Diskusi</button>
                         </div>
                         <div class="bg-white p-6 rounded-2xl shadow border flex flex-col justify-between">
                             <div>
-                                <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="payment_title">💳 Pembayaran Tahunan (99 SAR)</h3>
-                                <p class="text-sm text-slate-500 mb-4" data-i18n="payment_desc">Biaya langganan perlindungan hukum setahun penuh via transfer manual.</p>
+                                <h3 class="font-bold text-lg mb-2 text-brand-navy" data-i18n="payment_title">💳 Kontribusi Gotong Royong (99 SAR)</h3>
+                                <p class="text-sm text-slate-500 mb-4" data-i18n="payment_desc">Dukungan gotong royong tahunan untuk kelangsungan jaringan bantuan sesama pekerja.</p>
                             </div>
-                            <button onclick="openPaymentModal()" class="bg-amber-500 text-white px-4 py-3 rounded-xl text-sm font-bold text-center shadow" data-i18n="btn_upload_receipt">Kirim Bukti Bayar 99 SAR</button>
+                            <button onclick="openPaymentModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-3 rounded-xl text-sm font-bold text-center shadow transition" data-i18n="btn_upload_receipt">Kirim Bukti Kontribusi 99 SAR</button>
                         </div>
                     </div>
                 </div>`;
         }
 
-        // TAMPILAN PILIH PENGACARA UNTUK PEKERJA (WORKER)
+        // ================= PILIH PENGACARA (WORKER) =================
         function renderSelectLawyer(container) {
             container.innerHTML = `
                 <div class="max-w-5xl mx-auto px-4 py-8 w-full flex flex-col gap-6">
                     <div class="flex items-center justify-between bg-white p-6 rounded-2xl shadow border">
                         <div>
-                            <h2 class="text-xl font-bold text-brand-navy">⚖️ Pilih Pengacara Berlisensi</h2>
-                            <p class="text-xs text-slate-500 mt-1">Pilih salah satu advokat di bawah ini untuk memulai sesi konsultasi hukum personal.</p>
+                            <h2 class="text-xl font-bold text-brand-navy" data-i18n="select_lawyer_title">⚖️ Pilih Relawan / Advokat Pendamping</h2>
+                            <p class="text-xs text-slate-500 mt-1" data-i18n="select_lawyer_desc">Pilih pendamping di bawah ini untuk memulai sesi diskusi atau bantuan hukum personal.</p>
                         </div>
-                        <button onclick="switchView('workerDashboard', currentUser)" class="text-xs bg-slate-100 hover:bg-slate-200 text-brand-navy font-bold px-4 py-2 rounded-xl">Kembali</button>
+                        <button onclick="switchView('workerDashboard', currentUser)" class="text-xs bg-slate-100 hover:bg-slate-200 text-brand-navy font-bold px-4 py-2 rounded-xl transition" data-i18n="back">Kembali</button>
                     </div>
                     <div id="lawyers-list-container" class="grid md:grid-cols-2 gap-4">
-                        <p class="text-slate-500 text-sm">Memuat daftar pengacara...</p>
+                        <p class="text-slate-500 text-sm">Memuat daftar pendamping...</p>
                     </div>
                 </div>`;
             loadAvailableLawyers();
@@ -375,7 +646,7 @@
             const container = document.getElementById('lawyers-list-container');
             if(!container) return;
 
-            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'getLawyersList' }) })
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getLawyersList' }) })
             .then(res => res.json())
             .then(res => {
                 if(res.success && res.lawyers && res.lawyers.length > 0) {
@@ -386,51 +657,51 @@
                                 <div>
                                     <div class="flex items-center gap-3 mb-3">
                                         <div class="w-10 h-10 rounded-full bg-brand-navy text-amber-400 flex items-center justify-center font-bold">
-                                            <i class="fa-solid fa-user-tie"></i>
+                                            <i class="fa-solid fa-hands-holding-circle"></i>
                                         </div>
                                         <div>
                                             <h4 class="font-bold text-brand-navy text-base">${l.name}</h4>
-                                            <p class="text-xs text-slate-500">Lisensi: ${l.license || 'Resmi'}</p>
+                                            <p class="text-xs text-slate-500">Pendamping Solidaritas: ${l.license || 'Resmi'}</p>
                                         </div>
                                     </div>
-                                    <p class="text-xs text-slate-600 mb-4">Firm: ${l.lawFirm || 'Saudi Legal Practice'} | Tel: ${l.phone}</p>
+                                    <p class="text-xs text-slate-600 mb-4">Firm/Tim: ${l.lawFirm || 'Solidarity Network'} | Tel: ${l.phone}</p>
                                 </div>
-                                <button onclick="switchView('consultation', {user: currentUser, partnerId: '${l.iqamah}', partnerName: '${l.name}'})" class="w-full bg-brand-navy text-white text-xs font-bold py-3 rounded-xl shadow">
-                                    Konsultasi dengan ${l.name} <i class="fa-solid fa-arrow-right ml-1"></i>
+                                <button onclick="switchView('consultation', {partnerId: '${l.iqamah}', partnerName: '${l.name}'})" class="w-full bg-brand-navy hover:bg-slate-800 text-white text-xs font-bold py-3 rounded-xl shadow transition">
+                                    Mulai Diskusi dengan ${l.name} <i class="fa-solid fa-arrow-right ml-1"></i>
                                 </button>
                             </div>`;
                     });
                     container.innerHTML = html;
                 } else {
-                    container.innerHTML = `<div class="col-span-2 p-8 text-center bg-white rounded-xl border text-slate-500 text-sm">Belum ada pengacara yang terdaftar dalam sistem saat ini.</div>`;
+                    container.innerHTML = `<div class="col-span-2 p-8 text-center bg-white rounded-xl border text-slate-500 text-sm">Belum ada pendamping yang terdaftar dalam sistem saat ini.</div>`;
                 }
             }).catch(() => {
-                container.innerHTML = `<p class="text-red-500 text-sm">Gagal memuat daftar pengacara.</p>`;
+                container.innerHTML = `<p class="text-red-500 text-sm">Gagal memuat daftar pendamping.</p>`;
             });
         }
 
-        // LAWYER DASHBOARD: DAFTAR KLIEN TERPISAH (MUTABA'AH / LIVE TRACKING)
+        // ================= LAWYER DASHBOARD (MUTABA'AH / KLIEN) =================
         function renderLawyerDashboard(container, user) {
             currentUser = user;
             container.innerHTML = `
                 <div class="max-w-5xl mx-auto px-4 py-8 w-full flex flex-col gap-6">
                     <div class="bg-brand-navy rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
                         <div>
-                            <h2 class="text-2xl font-bold">Advokat Portal: ${user.name}</h2>
-                            <p class="text-amber-400 text-sm">Lisensi Praktik Aktif | Sistem Pemantauan Kasus Klien (Mutaba'ah)</p>
+                            <h2 class="text-2xl font-bold">Portal Pendamping: ${user.name}</h2>
+                            <p class="text-amber-400 text-sm">Jaringan Bantuan Solidaritas Sesama Pekerja (Mutaba'ah)</p>
                         </div>
-                        <button onclick="switchView('landing')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold" data-i18n="logout">Keluar</button>
+                        <button onclick="logoutSession()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition" data-i18n="logout">Keluar</button>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow border">
                         <div class="flex justify-between items-center mb-4">
                             <div>
-                                <h3 class="font-bold text-lg text-brand-navy">📋 Daftar Klien Masuk & Ruang Pesan Terpisah</h3>
-                                <p class="text-sm text-slate-500">Pilih salah satu klien di bawah ini untuk membuka ruang konsultasi dan memantau kasusnya secara mutaba'ah (real-time).</p>
+                                <h3 class="font-bold text-lg text-brand-navy">📋 Daftar Saudara Pekerja yang Membutuhkan Bantuan</h3>
+                                <p class="text-sm text-slate-500">Pilih salah satu pekerja di bawah ini untuk membuka ruang obrolan dan memantau kasusnya secara gotong royong.</p>
                             </div>
-                            <button onclick="loadLawyerClientsList()" class="bg-slate-100 hover:bg-slate-200 text-brand-navy text-xs font-bold px-3 py-2 rounded-lg border"><i class="fa-solid fa-rotate"></i> Muat Ulang</button>
+                            <button onclick="loadLawyerClientsList()" class="bg-slate-100 hover:bg-slate-200 text-brand-navy text-xs font-bold px-3 py-2 rounded-lg border transition"><i class="fa-solid fa-rotate"></i> Muat Ulang</button>
                         </div>
                         <div id="lawyer-clients-container" class="space-y-3">
-                            <p class="text-slate-500 text-sm">Memuat daftar klien...</p>
+                            <p class="text-slate-500 text-sm">Memuat daftar pekerja...</p>
                         </div>
                     </div>
                 </div>`;
@@ -440,9 +711,9 @@
         function loadLawyerClientsList() {
             const container = document.getElementById('lawyer-clients-container');
             if(!container) return;
-            container.innerHTML = `<p class="text-slate-500 text-sm">Memuat daftar klien...</p>`;
-            
-            fetch(CONFIG.API_URL, {
+            container.innerHTML = `<p class="text-slate-500 text-sm">Memuat daftar pekerja...</p>`;
+
+            fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'getLawyerClients', lawyerIqamah: currentUser.iqamah })
             })
@@ -455,11 +726,11 @@
                             <div class="border rounded-xl p-4 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition">
                                 <div>
                                     <h4 class="font-bold text-brand-navy text-base">${c.name}</h4>
-                                    <p class="text-xs text-slate-500">Iqamah Klien: <span class="font-semibold text-slate-700">${c.iqamah}</span></p>
+                                    <p class="text-xs text-slate-500">Iqamah Pekerja: <span class="font-semibold text-slate-700">${c.iqamah}</span></p>
                                     <p class="text-xs text-slate-600 mt-1 truncate max-w-md"><b>Pesan Terakhir:</b> ${c.lastMessage}</p>
                                 </div>
-                                <button onclick="switchView('consultation', {user: currentUser, partnerId: '${c.iqamah}', partnerName: '${c.name}'})" class="bg-brand-navy text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow">
-                                    Buka Ruang Pesan <i class="fa-solid fa-arrow-right ml-1"></i>
+                                <button onclick="switchView('consultation', {partnerId: '${c.iqamah}', partnerName: '${c.name}'})" class="bg-brand-navy hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition">
+                                    Buka Ruang Obrolan <i class="fa-solid fa-arrow-right ml-1"></i>
                                 </button>
                             </div>`;
                     });
@@ -468,242 +739,334 @@
                 } else {
                     container.innerHTML = `
                         <div class="p-8 text-center bg-slate-50 border rounded-xl">
-                            <p class="text-slate-500 text-sm mb-3">Belum ada klien yang mengirim pesan kepada Anda dalam sistem mutaba'ah.</p>
-                            <p class="text-xs text-slate-400">Saat pekerja memilih nama Anda dan mengirim pesan konsultasi, ruang obrolan klien akan otomatis muncul di sini.</p>
+                            <p class="text-slate-500 text-sm mb-3">Belum ada pekerja yang mengirim pesan kepada Anda dalam sistem gotong royong.</p>
+                            <p class="text-xs text-slate-400">Saat pekerja memilih nama Anda dan mengirim pesan bantuan, ruang obrolan akan otomatis muncul di sini.</p>
                         </div>`;
                 }
             }).catch(() => {
-                container.innerHTML = `<p class="text-red-500 text-sm">Gagal memuat daftar klien.</p>`;
+                container.innerHTML = `<p class="text-red-500 text-sm">Gagal memuat daftar pekerja.</p>`;
             });
         }
 
+        // ================= ADMIN DASHBOARD =================
         function renderAdminDashboard(container, user) {
             currentUser = user;
             container.innerHTML = `
                 <div class="max-w-6xl mx-auto px-4 py-8 w-full flex flex-col gap-6">
                     <div class="bg-brand-navy rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
                         <div>
-                            <h2 class="text-2xl font-bold">Panel Administrator</h2>
-                            <p class="text-amber-400 text-sm">Laporan pembayaran 99 SAR dan verifikasi langganan.</p>
+                            <h2 class="text-2xl font-bold">Panel Pengelola Gotong Royong</h2>
+                            <p class="text-amber-400 text-sm">Laporan kontribusi 99 SAR & manajemen jaringan solidaritas pekerja</p>
                         </div>
-                        <button onclick="switchView('landing')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold" data-i18n="logout">Keluar</button>
+                        <button onclick="logoutSession()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition" data-i18n="logout">Keluar</button>
                     </div>
-                    <div id="admin-reports-content" class="bg-white p-6 rounded-2xl shadow border">
-                        <p class="text-slate-500">Memuat laporan...</p>
+                    <div class="bg-white p-6 rounded-2xl shadow border">
+                        <h3 class="font-bold text-lg mb-4 text-brand-navy">📋 Daftar Kontribusi Masuk (99 SAR)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 border-b">
+                                        <th class="p-3">Waktu</th>
+                                        <th class="p-3">Iqamah</th>
+                                        <th class="p-3">Nama Pekerja</th>
+                                        <th class="p-3">Jumlah</th>
+                                        <th class="p-3">Bukti</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-payments-table">
+                                    <tr><td colspan="7" class="p-4 text-center text-slate-500">Memuat data kontribusi...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>`;
-            loadAdminData();
+            loadAdminPayments();
         }
 
-        function loadAdminData() {
-            showLoader();
-            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminReports' }) })
+        function loadAdminPayments() {
+            const tbody = document.getElementById('admin-payments-table');
+            if(!tbody) return;
+
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminReports' }) })
             .then(res => res.json())
             .then(res => {
-                hideLoader();
-                let html = `<h3 class="font-bold text-lg text-brand-navy mb-4">Laporan Pembayaran Langganan (99 SAR/tahun)</h3>`;
-                if(res.payments && res.payments.length > 0) {
-                    html += `<div class="overflow-x-auto"><table class="w-full text-left text-sm border-collapse"><thead class="bg-slate-100 border-b"><tr><th class="p-3">Iqamah</th><th class="p-3">Nama</th><th class="p-3">Jumlah</th><th class="p-3">Bukti</th><th class="p-3">Status</th><th class="p-3">Aksi</th></tr></thead><tbody>`;
+                if(res.success && res.payments && res.payments.length > 0) {
+                    let html = '';
                     res.payments.forEach(p => {
-                        html += `<tr class="border-b"><td class="p-3">${p.iqamah}</td><td class="p-3">${p.name}</td><td class="p-3">${p.amount} SAR</td><td class="p-3"><a href="${p.receipt}" target="_blank" class="text-blue-600 underline font-semibold">Lihat File</a></td><td class="p-3 font-semibold">${p.status}</td><td class="p-3"><button onclick="verifyPayment('${p.iqamah}', 'approve')" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold">Setujui (+1 Tahun)</button></td></tr>`;
+                        let statusBadge = p.status === 'Verified' ? '<span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-1 rounded-full">Verified</span>' : 
+                                          (p.status === 'Rejected' ? '<span class="bg-red-100 text-red-800 text-xs font-bold px-2.5 py-1 rounded-full">Rejected</span>' : 
+                                          '<span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">Pending</span>');
+                        
+                        let actions = p.status === 'Pending' ? `
+                            <button onclick="verifyPayment('${p.iqamah}', 'approve')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold mr-1 shadow">Setujui</button>
+                            <button onclick="verifyPayment('${p.iqamah}', 'reject')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow">Tolak</button>
+                        ` : '-';
+
+                        html += `
+                            <tr class="border-b hover:bg-slate-50 transition">
+                                <td class="p-3 text-xs text-slate-500">${new Date(p.timestamp).toLocaleDateString()}</td>
+                                <td class="p-3 font-semibold">${p.iqamah}</td>
+                                <td class="p-3">${p.name}</td>
+                                <td class="p-3 font-bold">${p.amount} SAR</td>
+                                <td class="p-3"><a href="${p.receipt}" target="_blank" class="text-blue-600 underline font-semibold text-xs">Lihat Bukti</a></td>
+                                <td class="p-3">${statusBadge}</td>
+                                <td class="p-3 text-center">${actions}</td>
+                            </tr>`;
                     });
-                    html += `</tbody></table></div>`;
+                    tbody.innerHTML = html;
                 } else {
-                    html += `<p class="text-slate-500 text-sm">Belum ada data pembayaran masuk.</p>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">Belum ada pengajuan kontribusi masuk.</td></tr>`;
                 }
-                document.getElementById('admin-reports-content').innerHTML = html;
+            }).catch(() => {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500">Gagal memuat laporan kontribusi.</td></tr>`;
             });
         }
 
-        function verifyPayment(iqamah, adminAction) {
+        async function verifyPayment(iqamah, adminAction) {
             showLoader();
-            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'verifyPaymentAdmin', iqamah, adminAction }) })
-            .then(res => res.json())
-            .then(res => { hideLoader(); alert(res.message); loadAdminData(); });
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'verifyPaymentAdmin', iqamah, adminAction })
+                });
+                const res = await response.json();
+                hideLoader();
+                alert(res.message || 'Status berhasil diperbarui.');
+                loadAdminPayments();
+            } catch(e) {
+                hideLoader();
+                alert('Gagal memproses verifikasi.');
+            }
         }
 
+        // ================= RUANG KONSULTASI / CHAT VVIP +++++ (PILIHAN BAHASA & GAYA TERJEMAHAN) =================
         function renderConsultation(container, data) {
-            const partnerId = data.partnerId;
-            const partnerName = data.partnerName;
-            const backDashboard = currentUser.role === 'lawyer' ? 'lawyerDashboard' : 'workerDashboard';
+            activePartnerIqamah = data.partnerId;
+            activePartnerName = data.partnerName;
 
             container.innerHTML = `
-                <div class="max-w-4xl mx-auto px-4 py-8 w-full flex flex-col h-[82vh]">
-                    <div class="bg-brand-navy text-white p-4 rounded-t-2xl flex justify-between items-center shadow">
-                        <div>
-                            <h3 class="font-bold">Konsultasi: ${partnerName}</h3>
-                            <p class="text-xs text-amber-300">ID Partner: ${partnerId} (Mutaba'ah & Terjemahan Aktif)</p>
+                <div class="max-w-4xl mx-auto px-4 py-8 w-full flex flex-col gap-4 flex-grow">
+                    <div class="bg-white p-4 rounded-2xl shadow border flex flex-col md:flex-row items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-brand-navy text-amber-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-hands-holding-circle"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-brand-navy text-base">Diskusi Solidaritas: ${activePartnerName}</h3>
+                                <p class="text-xs text-slate-500">Iqamah Partner: ${activePartnerIqamah}</p>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-amber-300">Target:</span>
-                            <select id="chatTargetLang" class="bg-slate-800 text-white text-xs rounded px-2 py-1 font-bold">
-                                <option value="ar">Arab 🇸🇦</option>
-                                <option value="id">Indo 🇮🇩</option>
-                                <option value="en">EN 🇬🇧</option>
-                            </select>
-                            <button onclick="switchView('${backDashboard}', currentUser)" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg ml-2">Kembali</button>
+                        
+                        <!-- PANEL PILIHAN VVIP TERJEMAHAN LANJUTAN -->
+                        <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-2.5 rounded-xl border">
+                            <div class="flex items-center gap-1.5">
+                                <label class="text-[11px] font-bold text-slate-600" data-i18n="target_lang">Bahasa:</label>
+                                <select id="chatTargetLang" onchange="updateStyleOptions()" class="bg-white border text-xs font-bold rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-navy cursor-pointer">
+                                    <option value="id">🇮🇩 ID</option>
+                                    <option value="ar" selected>🇸🇦 AR</option>
+                                    <option value="en">🇬🇧 EN</option>
+                                    <option value="ur">🇵🇰 UR</option>
+                                    <option value="ru">🇷🇺 RU</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <label class="text-[11px] font-bold text-slate-600" data-i18n="trans_mode">Gaya:</label>
+                                <select id="chatTranslationStyle" class="bg-white border text-xs font-bold rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-navy cursor-pointer">
+                                    <option value="formal">Formal & Profesional</option>
+                                    <option value="friendly">Santai & Persuasif</option>
+                                    <option value="legal">Pasal & Yuridis Resmi</option>
+                                </select>
+                            </div>
                         </div>
+
+                        <button onclick="navigateHome()" class="text-xs bg-slate-100 hover:bg-slate-200 text-brand-navy font-bold px-3 py-2 rounded-xl transition" data-i18n="back">Kembali</button>
                     </div>
-                    <div id="chat-box" class="flex-grow bg-white border-x border-slate-200 p-4 overflow-y-auto space-y-4 flex flex-col">
-                        <p class="text-center text-xs text-slate-400">Pesan otomatis diterjemahkan secara real-time</p>
-                    </div>
-                    <div class="bg-slate-100 p-4 rounded-b-2xl border border-slate-200 flex gap-2 items-center">
-                        <input type="file" id="chatFile" class="hidden" accept=".jpg,.jpeg,.png,.pdf" onchange="uploadChatFile(this, '${partnerId}')">
-                        <button onclick="document.getElementById('chatFile').click()" class="bg-slate-200 hover:bg-slate-300 px-3 py-3 rounded-xl text-slate-700" title="Unggah JPG/PDF"><i class="fa-solid fa-paperclip"></i></button>
-                        <input type="text" id="chatInput" placeholder="Ketik pesan konsultasi..." class="flex-grow bg-white border rounded-xl px-4 py-3 text-sm outline-none">
-                        <button onclick="sendChatMessage('${partnerId}')" class="bg-brand-navy text-white px-6 py-3 rounded-xl font-bold">Kirim</button>
+
+                    <div class="bg-white rounded-2xl shadow border flex flex-col flex-grow p-4" style="height: 500px;">
+                        <div id="chat-messages-box" class="flex-grow overflow-y-auto space-y-3 pr-2 mb-4">
+                            <p class="text-center text-slate-400 text-xs my-auto">Memuat riwayat pesan...</p>
+                        </div>
+                        <div class="flex gap-2 pt-2 border-t">
+                            <input type="text" id="chatInputMessage" data-i18n-placeholder="chat_placeholder" placeholder="Ketik pesan diskusi atau konsultasi..." class="flex-grow bg-slate-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy" onkeydown="if(event.key==='Enter') sendChatMessage()">
+                            <button onclick="sendChatMessage()" class="bg-brand-navy hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-xl shadow transition text-sm flex items-center gap-2">
+                                <span data-i18n="send">Kirim</span> <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>`;
-            fetchMessages(partnerId);
+
+            updateStyleOptions();
+            fetchMessages();
+            if(chatPollInterval) clearInterval(chatPollInterval);
+            chatPollInterval = setInterval(fetchMessages, 4000); // Polling real-time 4 detik
         }
 
-        function fetchMessages(partnerId) {
-            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'getMessages', userIqamah: currentUser.iqamah, partnerIqamah: partnerId }) })
-            .then(res => res.json())
-            .then(res => {
-                const box = document.getElementById('chat-box');
-                if(!box) return;
-                let html = `<p class="text-center text-xs text-slate-400">Riwayat Percakapan</p>`;
-                if(res.chats) {
-                    res.chats.forEach(c => {
-                        let isMe = c.senderIqamah === currentUser.iqamah;
-                        html += `<div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-                            <div class="max-w-md p-3 rounded-xl text-sm ${isMe ? 'bg-brand-navy text-white' : 'bg-slate-200 text-slate-900'}">
-                                <p>${c.message}</p>
-                                <p class="text-xs opacity-75 mt-1 italic">Terjemahan (${c.targetLang.toUpperCase()}): ${c.translated}</p>
-                                ${c.attachment ? `<a href="${c.attachment}" target="_blank" class="block text-xs underline mt-1 text-amber-300 font-semibold">Lihat File Lampiran (JPG/PDF)</a>` : ''}
-                            </div>
-                        </div>`;
-                    });
-                }
-                box.innerHTML = html;
-                box.scrollTop = box.scrollHeight;
-            });
+        function updateStyleOptions() {
+            const langSelect = document.getElementById('chatTargetLang');
+            const styleSelect = document.getElementById('chatTranslationStyle');
+            if(!langSelect || !styleSelect) return;
+
+            const targetVal = langSelect.value;
+            const styles = translationStyles[targetVal] || translationStyles['ar'];
+            
+            styleSelect.innerHTML = `
+                <option value="formal">${styles.formal}</option>
+                <option value="friendly">${styles.friendly}</option>
+                <option value="legal">${styles.legal}</option>
+            `;
         }
 
-        function sendChatMessage(partnerId) {
-            const input = document.getElementById('chatInput');
-            const targetLangSelect = document.getElementById('chatTargetLang');
-            const msg = input.value.trim();
-            if(!msg) return;
-
-            showLoader();
-            fetch(CONFIG.API_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'sendMessage',
-                    senderIqamah: currentUser.iqamah,
-                    senderRole: currentUser.role,
-                    receiverIqamah: partnerId,
-                    message: msg,
-                    sourceLang: currentLang,
-                    targetLang: targetLangSelect ? targetLangSelect.value : 'ar',
-                    attachmentLink: ''
-                })
-            }).then(() => {
-                hideLoader();
-                input.value = '';
-                fetchMessages(partnerId);
-            });
-        }
-
-        function uploadChatFile(input, partnerId) {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            showLoader();
-            reader.onload = function(e) {
-                fetch(CONFIG.API_URL, {
+        async function fetchMessages() {
+            if(!activePartnerIqamah || !currentUser) return;
+            try {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({
-                        action: 'uploadFile',
-                        base64: e.target.result,
-                        contentType: file.type,
-                        folderName: 'Case Files',
-                        fileName: file.name
+                        action: 'getMessages',
+                        userIqamah: currentUser.iqamah,
+                        partnerIqamah: activePartnerIqamah
                     })
-                }).then(res => res.json()).then(res => {
-                    hideLoader();
-                    if(res.success) {
-                        fetch(CONFIG.API_URL, {
+                });
+                const res = await response.json();
+                if(res.success) {
+                    renderChatMessages(res.chats);
+                }
+            } catch(e) {
+                console.error('Gagal mengambil pesan', e);
+            }
+        }
+
+        function renderChatMessages(chats) {
+            const box = document.getElementById('chat-messages-box');
+            if(!box) return;
+
+            if(!chats || chats.length === 0) {
+                box.innerHTML = `<div class="text-center text-slate-400 text-xs my-auto">Belum ada percakapan. Mulai diskusi atau kirim pesan bantuan gotong royong di bawah.</div>`;
+                return;
+            }
+
+            let html = '';
+            chats.forEach(c => {
+                const isMe = c.senderIqamah.toString() === currentUser.iqamah.toString();
+                const alignClass = isMe ? 'ml-auto bg-brand-navy text-white' : 'mr-auto bg-slate-100 text-slate-800 border';
+                const timeStr = new Date(c.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const styleBadge = c.translationStyle ? ` [Gaya: ${c.translationStyle}]` : '';
+
+                html += `
+                    <div class="max-w-[75%] rounded-2xl p-4 shadow-sm ${alignClass}">
+                        <div class="text-xs font-bold mb-1 opacity-80">${isMe ? 'Anda' : activePartnerName} (${c.sourceLang.toUpperCase()} → ${c.targetLang.toUpperCase()}${styleBadge})</div>
+                        <div class="text-sm font-medium">${c.message}</div>
+                        <div class="text-xs mt-2 pt-2 border-t border-white/20 italic opacity-90">Terjemahan VVIP: ${c.translated}</div>
+                        <div class="text-[10px] text-right mt-1 opacity-70">${timeStr}</div>
+                    </div>`;
+            });
+            box.innerHTML = html;
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInputMessage');
+            const targetLangSel = document.getElementById('chatTargetLang');
+            const styleSel = document.getElementById('chatTranslationStyle');
+            const message = input.value.trim();
+
+            if(!message || !activePartnerIqamah || !currentUser) return;
+
+            const sourceLang = currentLang === 'ar' ? 'ar' : (currentLang === 'id' ? 'id' : (currentLang === 'ur' ? 'ur' : (currentLang === 'ru' ? 'ru' : 'en')));
+            const targetLang = targetLangSel ? targetLangSel.value : 'ar';
+            const translationStyle = styleSel ? styleSel.value : 'formal';
+
+            input.value = '';
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'sendMessage',
+                        senderIqamah: currentUser.iqamah,
+                        senderRole: currentUser.role,
+                        receiverIqamah: activePartnerIqamah,
+                        message: message,
+                        sourceLang: sourceLang,
+                        targetLang: targetLang,
+                        translationStyle: translationStyle
+                    })
+                });
+                fetchMessages();
+            } catch(e) {
+                alert('Gagal mengirim pesan.');
+            }
+        }
+
+        // ================= MODAL PEMBAYARAN =================
+        function openPaymentModal() {
+            document.getElementById('paymentModal').classList.remove('hidden');
+            document.getElementById('paymentModal').classList.add('flex');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            document.getElementById('paymentModal').classList.remove('flex');
+        }
+
+        async function submitPaymentProof() {
+            const fileInput = document.getElementById('paymentReceiptFile');
+            if(fileInput.files.length === 0) {
+                alert('Pilih file bukti transfer terlebih dahulu.');
+                return;
+            }
+
+            showLoader();
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onload = async function() {
+                try {
+                    const uploadRes = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'uploadFile',
+                            base64: reader.result,
+                            contentType: file.type,
+                            folderName: 'Payments_Receipts',
+                            fileName: `Receipt_${currentUser.iqamah}_${Date.now()}`
+                        })
+                    });
+                    const uploadResult = await uploadRes.json();
+                    
+                    if(uploadResult.success) {
+                        const payRes = await fetch(API_URL, {
                             method: 'POST',
                             body: JSON.stringify({
-                                action: 'sendMessage',
-                                senderIqamah: currentUser.iqamah,
-                                senderRole: currentUser.role,
-                                receiverIqamah: partnerId,
-                                message: '[Mengunggah Berkas: ' + file.name + ']',
-                                sourceLang: currentLang,
-                                targetLang: 'ar',
-                                attachmentLink: res.fileLink
+                                action: 'submitPayment',
+                                iqamah: currentUser.iqamah,
+                                name: currentUser.name,
+                                receiptLink: uploadResult.fileLink
                             })
-                        }).then(() => fetchMessages(partnerId));
+                        });
+                        const payResult = await payRes.json();
+                        hideLoader();
+                        closePaymentModal();
+                        alert(payResult.message || 'Bukti kontribusi berhasil dikirim.');
+                    } else {
+                        hideLoader();
+                        alert('Gagal mengunggah file bukti kontribusi.');
                     }
-                });
+                } catch(e) {
+                    hideLoader();
+                    alert('Terjadi kesalahan sistem.');
+                }
             };
-            reader.readAsDataURL(file);
         }
 
-        function openPaymentModal() {
-            let receiptUrl = prompt("Masukkan Link Bukti Transfer Pembayaran 99 SAR (Google Drive / Gambar):");
-            if(!receiptUrl) return;
-            showLoader();
-            fetch(CONFIG.API_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'submitPayment',
-                    iqamah: currentUser.iqamah,
-                    name: currentUser.name,
-                    receiptLink: receiptUrl
-                })
-            }).then(res => res.json()).then(res => { hideLoader(); alert(res.message); });
-        }
-
-        function handleLoginSubmit(e) {
-            e.preventDefault();
-            const role = document.getElementById('loginRole').value;
-            const iqamah = document.getElementById('loginIqamah').value;
-            const password = document.getElementById('loginPassword').value;
-
-            showLoader();
-            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', role, iqamah, password }) })
-            .then(res => res.json())
-            .then(res => {
-                hideLoader();
-                if(res.success) {
-                    if(res.role === 'worker') switchView('workerDashboard', res);
-                    else if(res.role === 'lawyer') switchView('lawyerDashboard', res);
-                    else if(res.role === 'admin') switchView('adminDashboard', res);
-                } else { alert(res.message); }
-            });
-        }
-
-        function handleRegisterSubmit(e) {
-            e.preventDefault();
-            const role = document.getElementById('regRole').value;
-            const data = {
-                action: 'register',
-                role: role,
-                name: document.getElementById('regName').value,
-                iqamah: document.getElementById('regIqamah').value,
-                email: document.getElementById('regEmail').value,
-                phone: document.getElementById('regPhone').value,
-                password: document.getElementById('regPassword').value,
-                workplace: role === 'worker' ? document.getElementById('regExtra').value : '',
-                license: role === 'lawyer' ? document.getElementById('regExtra').value : ''
-            };
-
-            showLoader();
-            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify(data) })
-            .then(res => res.json())
-            .then(res => {
-                hideLoader();
-                alert(res.message);
-                if(res.success) switchView('login');
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => switchView('landing'));
+        // Inisialisasi awal
+        window.onload = function() {
+            switchView('landing');
+            changeSystemLanguage('id');
+        };
     </script>
 </body>
 </html>
